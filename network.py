@@ -1,32 +1,11 @@
+import activations
 import numpy as np
 import pandas as pd
-from typing import Callable, Iterable, Tuple
+from typing import Iterable, Tuple
 
-# Can use Sigmoid function to compress to 0-1 range as probability
-def sigmoid(z):
-    # Log loss is undefined for probability value of 1 and 0
-    # Use very small epsilon to clip result
-    eps = 1e-15
-    return np.maximum(
-        eps, np.minimum(
-            1-eps, np.divide(1, 1 + np.exp(-z))
-        )
-    )
-
-def d_sigmoid(z):
-    pass
-
-class act_func:
-    def __init__(self, fn: Callable, der: Callable) -> None:
-        self.fn = fn
-        self.der = der
-
-afuncs = {
-    'sigmoid': act_func(sigmoid, d_sigmoid),
-}
 
 class layer:
-    def __init__(self, nodes: int, act: act_func) -> None:
+    def __init__(self, nodes: int, act: activations.act_func) -> None:
         self.nodes = nodes
         self.act = act
 
@@ -102,9 +81,9 @@ def main():
     y = data.loc[:, "Outcome"].to_numpy()
 
     n = network(x, [
-        layer(3, afuncs['sigmoid']),
-        layer(3, afuncs['sigmoid']),
-        layer(1, afuncs['sigmoid'])
+        layer(3, activations.sigmoid),
+        layer(3, activations.sigmoid),
+        layer(1, activations.sigmoid)
     ], y)
 
     print(n.forward_propagate().shape)
