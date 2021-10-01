@@ -1,7 +1,8 @@
 import numpy as np
-from typing import Tuple
+import pandas as pd
+from typing import Callable, Tuple
 
-act_func: Tuple[function, function]
+act_func = Tuple[Callable, Callable]
 
 # Can use Sigmoid function to compress to 0-1 range as probability
 def sigmoid(z):
@@ -22,13 +23,13 @@ class layer:
         self.nodes = nodes
         self.fn, self.der = func
 
-    def input_shape(self, ni: int, nf: int) -> None:
+    def input_shape(self, shape: Tuple[int, int]) -> None:
         # Number of instances and features
-        self.ni = ni
-        self.nf = nf + 1 # bias will be considered an extra input
+        self.ni = shape[0]
+        self.nf = shape[1] + 1 # bias will be considered an extra input
 
-        # 1 weight per feature
-        self.w = np.random.rand(self.nf, 1)
+        # 1 weight per feature per node
+        self.w = np.random.rand(self.nf, self.nodes)
 
 
     # values: numpy matrix (instances x features)
@@ -43,3 +44,18 @@ class layer:
         self.y = self.fn(z)
 
         return self.y
+
+
+def main():
+    l1 = layer(3, (sigmoid, d_sigmoid))
+
+    # The input data (each row is an instance)
+    data = pd.read_csv("diabetes.csv", sep=",")
+    x = data.loc[:, "Pregnancies":"Age"].to_numpy()
+
+    l1.input_shape(x.shape)
+
+    y = l1.activate(x)
+    print(y.shape)
+
+main()
