@@ -31,11 +31,15 @@ class layer:
         self.w = np.random.rand(self.nf, 1)
 
 
-    # Values: numpy matrix (instances x features)
+    # values: numpy matrix (instances x features)
+    # returns: numpy matrix (instances x nodes)
     def activate(self, values):
         b = np.ones((self.ni, 1))
         x = np.concatenate((values, b), axis=1)
 
         z = np.matmul(x, self.w)
 
-        return self.fn(z)
+        # Save output value for use in back prop
+        self.y = self.fn(z)
+
+        return self.y
