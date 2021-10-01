@@ -23,18 +23,25 @@ class layer:
         self.nodes = nodes
         self.fn, self.der = func
 
-    def input_shape(self, shape: Tuple[int, int]) -> None:
+        # Weights will be randomly initalised on first activation
+        self.first_run = True
+
+    def init_weights(self, shape: Tuple[int,int]) -> None:
         # Number of instances and features
-        self.ni = shape[0]
-        self.nf = shape[1] + 1 # bias will be considered an extra input
+        self.ni, self.nf = shape
+
+        # bias will be considered an extra input
+        self.nf += 1
 
         # 1 weight per feature per node
         self.w = np.random.rand(self.nf, self.nodes)
 
-
     # values: numpy matrix (instances x features)
     # returns: numpy matrix (instances x nodes)
     def activate(self, values):
+        if self.first_run:
+            self.init_weights(values.shape)
+
         b = np.ones((self.ni, 1))
         x = np.concatenate((values, b), axis=1)
 
@@ -52,8 +59,6 @@ def main():
     # The input data (each row is an instance)
     data = pd.read_csv("diabetes.csv", sep=",")
     x = data.loc[:, "Pregnancies":"Age"].to_numpy()
-
-    l1.input_shape(x.shape)
 
     y = l1.activate(x)
     print(y.shape)
