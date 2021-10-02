@@ -1,11 +1,11 @@
-import activations
+import funcs
 import numpy as np
 import pandas as pd
 from typing import Iterable, Tuple
 
 
 class layer:
-    def __init__(self, nodes: int, act: activations.act_func) -> None:
+    def __init__(self, nodes: int, act: funcs.dfunc) -> None:
         self.nodes = nodes
         self.act = act
 
@@ -44,7 +44,8 @@ class network:
     def __init__(self,
         inputs,
         layers: Iterable[layer],
-        expected_out
+        expected_out,
+        loss_fn: funcs.dfunc = funcs.log_loss
     ) -> None:
         if len(layers) == 0:
             raise ValueError('Need at least one layer in the network')
@@ -52,6 +53,7 @@ class network:
         self.x = inputs
         self.layers = layers
         self.y = expected_out
+        self.loss_fn = loss_fn
 
     def forward_propagate(self):
         for l, layer in enumerate(self.layers):
@@ -61,15 +63,6 @@ class network:
                 # Output is saved in layers
                 y_hat = layer.activate(y_hat)
         return y_hat
-
-    def log_loss(self):
-        y_hat = self.layers[-1].y
-
-        # Remember these operations are element-wise
-        a = np.multiply(self.y, np.log(y_hat))
-        b = 1 - self.y
-        c = np.log(1 - y_hat)
-        return -(a + np.multiply(b,c))
 
     def backward_propagate(self):
         pass
@@ -81,9 +74,9 @@ def main():
     y = data.loc[:, "Outcome"].to_numpy()
 
     n = network(x, [
-        layer(3, activations.sigmoid),
-        layer(3, activations.sigmoid),
-        layer(1, activations.sigmoid)
+        layer(3, funcs.sigmoid),
+        layer(3, funcs.sigmoid),
+        layer(1, funcs.sigmoid)
     ], y)
 
     print(n.forward_propagate().shape)

@@ -1,7 +1,7 @@
 import numpy as np
 from typing import Callable
 
-class act_func:
+class dfunc:
     def __init__(self, fn: Callable, der: Callable) -> None:
         self.fn = fn
         self.der = der
@@ -20,5 +20,19 @@ def _sigmoid(z):
 def _d_sigmoid(z):
     pass
 
+def _log_loss(y, y_hat):
+    # Remember these operations are element-wise
+    a = np.multiply(y, np.log(y_hat))
+    b = 1 - y
+    c = np.log(1 - y_hat)
+    return -(a + np.multiply(b,c))
 
-sigmoid = act_func(_sigmoid, _d_sigmoid)
+def _d_log_loss(y, y_hat):
+    # Remember these operations are element-wise
+    a = y - y_hat
+    b = (1 - y_hat) * y_hat
+
+    return -a / b
+
+sigmoid = dfunc(_sigmoid, _d_sigmoid)
+log_loss = dfunc(_log_loss, _d_log_loss)
