@@ -12,20 +12,22 @@ def _sigmoid(z):
     # Use very small epsilon to clip result
     eps = 1e-15
     return np.maximum(
-        eps, np.minimum(
-            1-eps, np.divide(1, 1 + np.exp(-z))
+        eps,
+        np.minimum(
+            1-eps,
+            1 / 1 + np.exp(-z)
         )
     )
 
 def _d_sigmoid(z):
-    pass
+    return np.exp(z) / (np.exp(z) + 1) ** 2
 
 def _log_loss(y, y_hat):
     # Remember these operations are element-wise
-    a = np.multiply(y, np.log(y_hat))
+    a = y * np.log(y_hat)
     b = 1 - y
     c = np.log(1 - y_hat)
-    return -(a + np.multiply(b,c))
+    return -(a + b * c)
 
 def _d_log_loss(y, y_hat):
     # Remember these operations are element-wise

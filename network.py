@@ -34,7 +34,7 @@ class layer:
         b = np.ones((self.ni, 1))
         x = np.concatenate((values, b), axis=1)
 
-        z = np.matmul(x, self.w)
+        z = x @ self.w
 
         # Save output value for use in back prop
         self.y = self.act.fn(z)
