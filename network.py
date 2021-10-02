@@ -5,7 +5,10 @@ from typing import Iterable, Tuple
 
 
 class layer:
-    def __init__(self, nodes: int, act: funcs.dfunc) -> None:
+    def __init__(self,
+        nodes: int,
+        act: funcs.dfunc = funcs.sigmoid
+    ) -> None:
         self.nodes = nodes
         self.act = act
 
@@ -74,9 +77,9 @@ def main():
     y = data.loc[:, "Outcome"].to_numpy()
 
     n = network(x, [
-        layer(3, funcs.sigmoid),
-        layer(3, funcs.sigmoid),
-        layer(1, funcs.sigmoid)
+        layer(3),
+        layer(3),
+        layer(1)
     ], y)
 
     print(n.forward_propagate().shape)
