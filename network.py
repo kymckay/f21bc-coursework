@@ -22,8 +22,8 @@ class layer:
         # bias will be considered an extra input
         self.nf += 1
 
-        # 1 weight per feature per node
-        self.w = np.random.rand(self.nf, self.nodes)
+        # w_jk = weight from input k to node j
+        self.w = np.random.rand(self.nodes, self.nf)
 
     # values: numpy matrix (instances x features)
     # returns: numpy matrix (instances x nodes)
@@ -38,7 +38,7 @@ class layer:
         self.x = np.concatenate((values, b), axis=1)
 
         # Save intermediate output for use in back prop
-        self.z = self.x @ self.w
+        self.z = self.x @ self.w.T
 
         return self.act.fn(self.z)
 
