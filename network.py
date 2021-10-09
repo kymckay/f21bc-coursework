@@ -23,7 +23,7 @@ class layer:
         self.nf += 1
 
         # w_jk = weight from input k to node j
-        self.w = np.random.rand(self.nodes, self.nf)
+        self.w = np.random.rand(self.nodes, self.nf) * 0.01
 
     # values: numpy matrix (instances x features)
     # returns: numpy matrix (instances x nodes)
