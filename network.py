@@ -81,8 +81,8 @@ class network:
         dL_da = self.loss_fn.der(self.y, self.y_hat)
 
         for i, layer in enumerate(reversed(self.layers)):
-            # Derivative of activation function
-            da_dz = layer.act.der(layer.z)
+            # First step of chain rule to "unwrap" activation function
+            dL_dz = layer.act.der(layer.z) * dL_da
 
             # Derivative with respect to w_jk is just x_k
             # With multi-nodes, each gets the same input (extra axis)
@@ -93,7 +93,7 @@ class network:
             # (the 3rd dimension (index 0) here for instances
             # already matches)
             # print(dz_dw.shape, dL_dz.shape)
-            dL_dw = dz_dw * np.expand_dims(da_dz * dL_da, 2)
+            dL_dw = dz_dw * np.expand_dims(dL_dz, 2)
 
             # Update the weights using the averaged result
             # across all instances
@@ -109,7 +109,7 @@ class network:
 
             # Derivative with respect to activation of
             # previous layer (equivalent to input of this layer)
-            dL_da = dz_dx * da_dz * dL_da
+            dL_da = dz_dx * dL_dz
 
 
 def main():
