@@ -42,14 +42,6 @@ class layer:
 
         return self.act.fn(self.z)
 
-    # alpha is learning rate from NN
-    def update_weights(self, dL_dw, alpha: float) -> None:
-        # Update the weights using the averaged result
-        # across all instances
-        dL_dw = np.mean(dL_dw, axis=0)[np.newaxis, :]
-        self.w = self.w - alpha * dL_dw
-
-
 class network:
     # inputs should be a matrix (instances x features)
     # expected_out should be an array of length (instances)
@@ -88,18 +80,28 @@ class network:
         # activation of current layer
         dL_da = self.loss_fn.der(self.y, self.y_hat)
 
-        for layer in reversed(self.layers):
+        for i, layer in enumerate(reversed(self.layers)):
             # Derivative of activation function
             da_dz = layer.act.der(layer.z)
 
             # Derivative with respect to w_jk is just x_k
-            dz_dw = layer.x
+            # With multi-nodes, each gets the same input (extra axis)
+            dz_dw = np.expand_dims(layer.x, 1)
 
-            # This ends up multiplying column-wise, going
+            # This ends up multiplying broadcasted, going
             # from 1D activation to 2D weight connections
-            dL_dw = dz_dw * da_dz * dL_da
+            # (the 3rd dimension (index 0) here for instances
+            # already matches)
+            # print(dz_dw.shape, dL_dz.shape)
+            dL_dw = dz_dw * np.expand_dims(da_dz * dL_da, 2)
 
-            layer.update_weights(dL_dw, self.alpha)
+            # Update the weights using the averaged result
+            # across all instances
+            layer.w = layer.w - self.alpha * np.mean(dL_dw, axis=0)
+
+            # Once first layer weights update nothing left to do
+            if i == len(self.layers) - 1:
+                break
 
             # Derivative with respect to x_k is just w_jk summed over j
             # Drop last k because bias not from previous layer
@@ -118,8 +120,8 @@ def main():
 
     n = network(x, [
         layer(1),
-        layer(1),
-        layer(1),
+        layer(2),
+        layer(2),
         layer(1),
     ], y)
 
