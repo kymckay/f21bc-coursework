@@ -101,9 +101,9 @@ class network:
 
             layer.update_weights(dL_dw, self.alpha)
 
-            # Derivative with respect to x_k is just w_k
+            # Derivative with respect to x_k is just w_jk summed over j
             # Drop last k because bias not from previous layer
-            dz_dx = layer.w[:, :-1]
+            dz_dx = np.sum(layer.w[:, :-1], axis=0)[np.newaxis, :]
 
             # Derivative with respect to activation of
             # previous layer (equivalent to input of this layer)
