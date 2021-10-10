@@ -26,7 +26,7 @@ class layer:
         self.w = np.random.rand(self.nodes, self.nf) * 0.01
 
     # values: numpy matrix (instances x features)
-    # returns: numpy matrix (instances x nodes)
+    # returns: numpy matrix (instances x neurons)
     def activate(self, values):
         if self.first_run:
             self.init_weights(values.shape)
@@ -80,20 +80,25 @@ class network:
         # activation of current layer
         dL_da = self.loss_fn.der(self.y, self.y_hat)
 
+        # All folowing matrix arithmetic uses dimensions:
+        # instances x neurons x inputs
         for i, layer in enumerate(reversed(self.layers)):
             # First step of chain rule to "unwrap" activation function
-            dL_dz = layer.act.der(layer.z) * dL_da
+            # Neurons are the same for all inputs (extra axis)
+            dL_dz = np.expand_dims(
+                layer.act.der(layer.z) * dL_da,
+                2
+            )
 
             # Derivative with respect to w_jk is just x_k
-            # With multi-nodes, each gets the same input (extra axis)
+            # Inputs are the same for all neurons (extra axis)
             dz_dw = np.expand_dims(layer.x, 1)
 
             # This ends up multiplying broadcasted, going
             # from 1D activation to 2D weight connections
             # (the 3rd dimension (index 0) here for instances
             # already matches)
-            # print(dz_dw.shape, dL_dz.shape)
-            dL_dw = dz_dw * np.expand_dims(dL_dz, 2)
+            dL_dw = dz_dw * dL_dz
 
             # Update the weights using the averaged result
             # across all instances
@@ -105,11 +110,12 @@ class network:
 
             # Derivative with respect to x_k is just w_jk summed over j
             # Drop last k because bias not from previous layer
-            dz_dx = np.sum(layer.w[:, :-1], axis=0)[np.newaxis, :]
+            # Weights are the same for all instances (extra axis)
+            dz_dx = np.expand_dims(layer.w[:, :-1], 0)
 
             # Derivative with respect to activation of
             # previous layer (equivalent to input of this layer)
-            dL_da = dz_dx * dL_dz
+            dL_da = np.sum(dz_dx * dL_dz, axis=1)
 
 
 def main():
@@ -119,8 +125,8 @@ def main():
     y = data.loc[:, "Outcome"].to_numpy()
 
     n = network(x, [
-        layer(1),
-        layer(2),
+        layer(4),
+        layer(3),
         layer(2),
         layer(1),
     ], y)
