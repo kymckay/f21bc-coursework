@@ -20,7 +20,7 @@ def _sigmoid(z):
     )
 
 def _d_sigmoid(z):
-    return np.exp(z) / (np.exp(z) + 1) ** 2
+    return _sigmoid(z) * (1 - _sigmoid(z))
 
 def _log_loss(y, y_hat):
     # Remember these operations are element-wise
