@@ -30,6 +30,7 @@ class layer:
     def activate(self, values):
         if self.first_run:
             self.init_weights(values.shape)
+            self.first_run = False
 
         # Add bias as an extra input to reduce complexity
         b = np.ones((self.ni, 1))
