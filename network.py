@@ -117,6 +117,33 @@ class network:
             # previous layer (equivalent to input of this layer)
             dL_da = np.sum(dz_dx * dL_dz, axis=1)
 
+    def get_loss(self) -> float:
+        return np.mean(self.loss_fn.fn(self.y, self.y_hat))
+
+    def learn(self,
+        epochs:int = None,
+        delta:float = None,
+        showProgress:int = 0
+    ):
+        if (epochs is None) and (delta is None):
+            raise ValueError(
+                "Must specify epochs to learn over or delta to consider convergance under"
+            )
+
+        # Give initial reference point
+        self.forward_propagate()
+        print(f'0 epochs: loss = {self.get_loss()}')
+
+        if epochs:
+            for i in range(1, epochs + 1):
+                self.backward_propagate()
+                self.forward_propagate()
+
+                if showProgress and (i % showProgress == 0):
+                    L = self.get_loss()
+                    print(f'{i} epochs: loss = {L}')
+
+        # TODO: delta convergance
 
 def main():
     # The input data (each row is an instance)
@@ -126,12 +153,10 @@ def main():
 
     n = network(x, [
         layer(4),
-        layer(3),
-        layer(2),
+        layer(4),
         layer(1),
     ], y)
 
-    n.forward_propagate()
-    n.backward_propagate()
+    n.learn(20000, showProgress=1000)
 
 main()
