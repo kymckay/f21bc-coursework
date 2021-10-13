@@ -149,16 +149,18 @@ class network:
 
 def main():
     # The input data (each row is an instance)
-    data = pd.read_csv("diabetes.csv", sep=",")
-    x = data.loc[:, "Pregnancies":"Age"].to_numpy()
-    y = data.loc[:, "Outcome"].to_numpy()
+    data = pd.read_csv("data_banknote_authentication.txt",
+        sep=",",
+        header=None,
+    )
+    x = data.iloc[:, 0:3].to_numpy()
+    y = data.iloc[:, 4].to_numpy()
 
     n = network(x, [
-        layer(4),
-        layer(4),
+        layer(2),
         layer(1),
-    ], y)
+    ], y, alpha=0.1)
 
-    n.learn(20000, showProgress=1000)
+    n.learn(10000, showProgress=2000)
 
 main()
