@@ -8,16 +8,7 @@ class dfunc:
 
 # Can use Sigmoid function to compress to 0-1 range as probability
 def _sigmoid(z):
-    # Log loss is undefined for probability value of 1 and 0
-    # Use very small epsilon to clip result
-    eps = 1e-15
-    return np.maximum(
-        eps,
-        np.minimum(
-            1-eps,
-            1 / 1 + np.exp(-z)
-        )
-    )
+    return 1 / (1 + np.exp(-z))
 
 def _d_sigmoid(z):
     return _sigmoid(z) * (1 - _sigmoid(z))
