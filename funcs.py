@@ -22,7 +22,7 @@ def _log_loss(y, y_hat):
 
 def _d_log_loss(y, y_hat):
     # Remember these operations are element-wise
-    return -y/y_hat + (1 - y)/(1 - y_hat)
+    return (y_hat - y) / (y_hat - y_hat**2)
 
 sigmoid = dfunc(_sigmoid, _d_sigmoid)
 log_loss = dfunc(_log_loss, _d_log_loss)

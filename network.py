@@ -23,7 +23,7 @@ class layer:
         self.nf += 1
 
         # w_jk = weight from input k to node j
-        self.w = np.random.rand(self.nodes, self.nf) * 0.01
+        self.w = np.random.rand(self.nodes, self.nf)
 
     # values: numpy matrix (instances x features)
     # returns: numpy matrix (instances x neurons)
@@ -78,45 +78,46 @@ class network:
 
     def backward_propagate(self):
         # Derivative of loss function, with respect to
-        # activation of current layer
+        # activation of current layer.
+        # Shape (instances x neurons)
         dL_da = self.loss_fn.der(self.y, self.y_hat)
 
-        # All folowing matrix arithmetic uses dimensions:
-        # instances x neurons x inputs
+        # There are three dimensions to consider in all following:
+        # instances, neurons, features (all of current layer)
         for i, layer in enumerate(reversed(self.layers)):
             # First step of chain rule to "unwrap" activation function
-            # Neurons are the same for all inputs (extra axis)
-            dL_dz = np.expand_dims(
-                layer.act.der(layer.z) * dL_da,
-                2
-            )
+            # These values are shape (instances x neruons)
+            dL_dz = layer.act.der(layer.z) * dL_da
 
             # Derivative with respect to w_jk is just x_k
-            # Inputs are the same for all neurons (extra axis)
-            dz_dw = np.expand_dims(layer.x, 1)
+            # Hence, the same for all neurons (j=0, ..., n)
+            # Shape (instances x features)
+            dz_dw = layer.x
 
-            # This ends up multiplying broadcasted, going
-            # from 1D activation to 2D weight connections
-            # (the 3rd dimension (index 0) here for instances
-            # already matches)
-            dL_dw = dz_dw * dL_dz
+            # Matrix multiplication here achieves the first step of
+            # averaging across instances (sum of products).
+            # Shape (neurons x features)
+            dL_dw = dL_dz.T @ dz_dw
 
-            # Update the weights using the averaged result
-            # across all instances
-            layer.w = layer.w - self.alpha * np.mean(dL_dw, axis=0)
+            # Dividing by number of instances gets the average
+            # Learning rate dictates rate of learning
+            layer.w = layer.w - self.alpha * dL_dw / self.x.shape[0]
 
-            # Once first layer weights update nothing left to do
+            # Once input layer weights update, nothing left to do
             if i == len(self.layers) - 1:
                 break
 
             # Derivative with respect to x_k is just w_jk summed over j
             # Drop last k because bias not from previous layer
-            # Weights are the same for all instances (extra axis)
-            dz_dx = np.expand_dims(layer.w[:, :-1], 0)
+            # Weights are the same for all instances
+            # Shape (neurons x features)
+            dz_dx = layer.w[:, :-1]
 
-            # Derivative with respect to activation of
-            # previous layer (equivalent to input of this layer)
-            dL_da = np.sum(dz_dx * dL_dz, axis=1)
+            # Matrix multiplication here achieves the sum over j
+            # mentioned above.
+            # Shape (instances x features) equivalent of
+            # (instances x neurons in previous layer)
+            dL_da = dL_dz @ dz_dx
 
     def get_loss(self) -> float:
         return np.mean(self.loss_fn.fn(self.y, self.y_hat))
