@@ -27,6 +27,14 @@ def _relu(z):
 def _d_relu(z):
     vectorised_func = np.vectorize(lambda x : 0 if x < 0 else 1)
     return vectorised_func(z)
+
+def _leaky_relu(z):
+    return np.maximum(z*0.01, z)
+
+def _d_leaky_relu(z):
+    vectorised_func = np.vectorize(lambda x : 0.001 if x < 0 else 1)
+    return vectorised_func(z)
+
     
 def _log_loss(y, y_hat):
     # Remember these operations are element-wise
@@ -42,4 +50,5 @@ def _d_log_loss(y, y_hat):
 sigmoid = dfunc(_sigmoid, _d_sigmoid)
 tanh = dfunc(_tanh, _d_tanh)
 relu = dfunc(_relu, _d_relu)
+leaky_relu = dfunc(_leaky_relu, _d_leaky_relu)
 log_loss = dfunc(_log_loss, _d_log_loss)
