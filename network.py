@@ -1,5 +1,4 @@
 import funcs
-import time
 import numpy as np
 import pandas as pd
 from typing import Iterable, Tuple
@@ -9,7 +8,7 @@ import matplotlib.pyplot as plt
 class layer:
     def __init__(self,
         nodes: int,
-        act: funcs.dfunc = funcs.relu 
+        act: funcs.dfunc = funcs.leaky_relu
     ) -> None:
         self.nodes = nodes
         self.act = act
@@ -25,7 +24,8 @@ class layer:
         self.nf += 1
 
         # w_jk = weight from input k to node j
-        self.w = np.random.rand(self.nodes, self.nf)
+        # multiply initial weight values by 0.01 to prevent exponent overflow in the sigmoid function in the final layer when useing relu funcs
+        self.w = np.random.rand(self.nodes, self.nf) * 0.01 
 
     # values: numpy matrix (instances x features)
     # returns: numpy matrix (instances x neurons)
@@ -42,7 +42,7 @@ class layer:
 
         # Save intermediate output for use in back prop
         self.z = self.x @ self.w.T
-
+        
         return self.act.fn(self.z)
 
 class network:
@@ -89,6 +89,7 @@ class network:
         for i, layer in enumerate(reversed(self.layers)):
             # First step of chain rule to "unwrap" activation function
             # These values are shape (instances x neruons)
+            
             dL_dz = layer.act.der(layer.z) * dL_da
 
             # Derivative with respect to w_jk is just x_k
@@ -136,7 +137,7 @@ class network:
 
         # Give initial reference point
         self.forward_propagate()
-        print(f'0 epochs: loss = {self.get_loss()}')
+    
         accuracy = [] # collection of prediction accuracy for each epoch
         loss = []
 
@@ -154,51 +155,8 @@ class network:
                 accuracy.append(np.sum(acc)/len(self.y))
                 
                 loss.append(self.get_loss())
-                if showProgress and (i % showProgress == 0):
-                    L = self.get_loss()
-                    print(f'{i} epochs: loss = {L}')
+
         return accuracy, loss
 
         # TODO: delta convergance
-
-def main():
-    # The input data (each row is an instance)
-    data = pd.read_csv("data_banknote_authentication.txt",
-        sep=",",
-        header=None,
-    )
-    x = data.iloc[:, 0:3].to_numpy()
-    y = data.iloc[:, 4].to_numpy()
-
-
-    n = network(x, [
-        layer(2),
-        layer(1, funcs.sigmoid),
-    ], y, alpha=0.1)
-
-    start_time = time.time()
-    acc, loss  = n.learn(100, showProgress=100)
-    t_time = time.time() - start_time # training time
-
-    return acc, loss, t_time
-    
-acc, loss, t_time = [], [], []
-# for each set of hyperparameters investigated, re-train the network a set number of times
-for i in range (2):
-    a, l, t = main()
-    acc.append(a)
-    loss.append(l)
-    t_time.append(t)
-
-print("Average training time {}s".format(np.mean(t)))
-
-# plot the average accuracy/ loss
-plt.plot(np.mean(acc, axis=0), linestyle = 'dotted', label = 'Accuracy')
-plt.plot(np.mean(loss, axis=0), linestyle = 'dotted', label = 'Loss')
-plt.xlabel('Epochs')
-plt.ylabel('Rate')
-plt.legend()
-plt.show()
-
-
 
