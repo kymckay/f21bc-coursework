@@ -49,6 +49,22 @@
 
 \section{Program development rationale}
 
+The ANN was implemented in Python to make use of the NumPy library which provides convenient and fast matrix arithmetic implementations --
+needed to efficiently perform forward and backward propagation.
+
+The implementation was realised as a pair of classes: \lstinline{layer} and \lstinline{network}. This decision was made from the start because
+it was noticed that propagation across the whole network (in either
+direction) can be considered as propagation across a single layer at a time in sequence. In this way a generalisable implementation can be achieved to later allow very easy modification of hyperparameters.
+
+Propagation itself is achieved through carefully considered matrix
+operations such that the output of each layer can be fed
+forwards/backwards directly to the next and the process repeated along
+the sequence. Use of matrix operations enables efficient calculation
+across all nodes, instances and features at once in each layer rather
+than looping through each.
+
+For convenience, the activation functions and loss function used by the network are configurable as parameters in the constructors of the layer and network respectively. These are realised as instances of the \lstinline{dfunc} class defined in funcs.py which just conveniently packages the function and its first derivative together for later use.
+
 \section{Methods}
 
 \section{Results}
