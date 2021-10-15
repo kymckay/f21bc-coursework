@@ -2,6 +2,7 @@ import funcs
 import numpy as np
 import pandas as pd
 from typing import Iterable, Tuple
+import matplotlib.pyplot as plt
 
 
 class layer:
@@ -135,15 +136,27 @@ class network:
         # Give initial reference point
         self.forward_propagate()
         print(f'0 epochs: loss = {self.get_loss()}')
+        accuracy = [] # collection of prediction accuracy for each epoch
+        loss = []
 
         if epochs:
             for i in range(1, epochs + 1):
                 self.backward_propagate()
-                self.forward_propagate()
-
+                a = self.forward_propagate()
+                # sort output from the final round of forward prop as 1s or 0s
+                a = np.apply_along_axis(lambda x : 0 if x < 0.5 else 1, 1, a)
+                
+                # intermediate array, keeps track of correct (1s) and faulty (0s) predictions for the given epoch 
+                acc = []
+                for j in range (len(self.y)):
+                    acc.append(1 if a[j] == self.y[j] else 0)
+                accuracy.append(np.sum(acc)/len(self.y))
+                
+                loss.append(self.get_loss())
                 if showProgress and (i % showProgress == 0):
                     L = self.get_loss()
                     print(f'{i} epochs: loss = {L}')
+        return accuracy, loss
 
         # TODO: delta convergance
 
@@ -156,11 +169,19 @@ def main():
     x = data.iloc[:, 0:3].to_numpy()
     y = data.iloc[:, 4].to_numpy()
 
+
     n = network(x, [
         layer(2),
         layer(1),
     ], y, alpha=0.1)
 
-    n.learn(10000, showProgress=2000)
+    acc, loss = n.learn(1000, showProgress=100)
+    
+    plt.plot(acc, linestyle = 'dotted', label = 'Accuracy')
+    plt.plot(loss, linestyle = 'dotted', label = 'Loss')
+    plt.xlabel('Epochs')
+    plt.ylabel('Rate')
+    plt.legend()
+    plt.show()
 
 main()
