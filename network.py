@@ -1,4 +1,5 @@
 import funcs
+import time
 import numpy as np
 import pandas as pd
 from typing import Iterable, Tuple
@@ -175,14 +176,19 @@ def main():
         layer(1),
     ], y, alpha=0.1)
 
-    return n.learn(100, showProgress=100)
+    start_time = time.time()
+    acc, loss  = n.learn(100, showProgress=100)
+    t_time = time.time() - start_time # training time
+
+    return acc, loss, t_time
     
-acc, loss = [], []
-# for each set of hyperparameters repeat the experiment a set number of times
-for i in range (10):
-    a, l = main()
+acc, loss, t_time = [], [], []
+# for each set of hyperparameters investigated, re-train the network a set number of times
+for i in range (2):
+    a, l, t = main()
     acc.append(a)
     loss.append(l)
+    t_time.append(t)
 
 # plot the average accuracy/ loss
 plt.plot(np.mean(acc, axis=0), linestyle = 'dotted', label = 'Accuracy')
@@ -191,3 +197,5 @@ plt.xlabel('Epochs')
 plt.ylabel('Rate')
 plt.legend()
 plt.show()
+
+
