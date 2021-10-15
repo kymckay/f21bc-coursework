@@ -9,7 +9,7 @@ import matplotlib.pyplot as plt
 class layer:
     def __init__(self,
         nodes: int,
-        act: funcs.dfunc = funcs.sigmoid
+        act: funcs.dfunc = funcs.relu 
     ) -> None:
         self.nodes = nodes
         self.act = act
@@ -173,7 +173,7 @@ def main():
 
     n = network(x, [
         layer(2),
-        layer(1),
+        layer(1, funcs.sigmoid),
     ], y, alpha=0.1)
 
     start_time = time.time()
@@ -190,6 +190,8 @@ for i in range (2):
     loss.append(l)
     t_time.append(t)
 
+print("Average training time {}s".format(np.mean(t)))
+
 # plot the average accuracy/ loss
 plt.plot(np.mean(acc, axis=0), linestyle = 'dotted', label = 'Accuracy')
 plt.plot(np.mean(loss, axis=0), linestyle = 'dotted', label = 'Loss')
@@ -197,5 +199,6 @@ plt.xlabel('Epochs')
 plt.ylabel('Rate')
 plt.legend()
 plt.show()
+
 
 
