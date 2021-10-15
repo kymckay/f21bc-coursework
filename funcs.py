@@ -32,7 +32,7 @@ def _leaky_relu(z):
     return np.maximum(z*0.01, z)
 
 def _d_leaky_relu(z):
-    vectorised_func = np.vectorize(lambda x : 0.001 if x < 0 else 1)
+    vectorised_func = np.vectorize(lambda x : 0.01 if x < 0 else 1)
     return vectorised_func(z)
 
     
