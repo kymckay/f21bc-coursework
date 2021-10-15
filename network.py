@@ -175,13 +175,19 @@ def main():
         layer(1),
     ], y, alpha=0.1)
 
-    acc, loss = n.learn(1000, showProgress=100)
+    return n.learn(100, showProgress=100)
     
-    plt.plot(acc, linestyle = 'dotted', label = 'Accuracy')
-    plt.plot(loss, linestyle = 'dotted', label = 'Loss')
-    plt.xlabel('Epochs')
-    plt.ylabel('Rate')
-    plt.legend()
-    plt.show()
+acc, loss = [], []
+# for each set of hyperparameters repeat the experiment a set number of times
+for i in range (10):
+    a, l = main()
+    acc.append(a)
+    loss.append(l)
 
-main()
+# plot the average accuracy/ loss
+plt.plot(np.mean(acc, axis=0), linestyle = 'dotted', label = 'Accuracy')
+plt.plot(np.mean(loss, axis=0), linestyle = 'dotted', label = 'Loss')
+plt.xlabel('Epochs')
+plt.ylabel('Rate')
+plt.legend()
+plt.show()
