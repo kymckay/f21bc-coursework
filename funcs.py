@@ -16,11 +16,11 @@ def _d_sigmoid(z):
 # output value between 1 and -1 therefore can't be used in the output layer (use sofmax func (e.g., sigmoid) instead)
 def _tanh(z):
     return (np.exp(z) - np.exp(-z)) / (np.exp(z) + np.exp(-z))
-    
-def _d_tanh(z):
-    return 1 - _tanh(z) * _tanh(z)
 
-# can't be used in the output layer 
+def _d_tanh(z):
+    return 1 - _tanh(z) ** 2
+
+# can't be used in the output layer
 def _relu(z):
     return np.maximum(0, z)
 
@@ -35,7 +35,6 @@ def _d_leaky_relu(z):
     vectorised_func = np.vectorize(lambda x : 0.01 if x < 0 else 1)
     return vectorised_func(z)
 
-    
 def _log_loss(y, y_hat):
     # Remember these operations are element-wise
     a = y * np.log(y_hat)

@@ -144,4 +144,4 @@ class network:
                 accuracy.append(np.mean(predicted == self.y))
                 loss.append(self.get_loss())
 
-        return accuracy, loss
+        return np.array(accuracy), np.array(loss)
