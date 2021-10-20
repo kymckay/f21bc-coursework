@@ -1,8 +1,6 @@
 import funcs
 import numpy as np
-import pandas as pd
 from typing import Iterable, Tuple
-import matplotlib.pyplot as plt
 
 
 class layer:
@@ -25,7 +23,7 @@ class layer:
 
         # w_jk = weight from input k to node j
         # multiply initial weight values by 0.01 to prevent exponent overflow in the sigmoid function in the final layer when useing relu funcs
-        self.w = np.random.rand(self.nodes, self.nf) * 0.01 
+        self.w = np.random.rand(self.nodes, self.nf) * 0.01
 
     # values: numpy matrix (instances x features)
     # returns: numpy matrix (instances x neurons)
@@ -42,7 +40,7 @@ class layer:
 
         # Save intermediate output for use in back prop
         self.z = self.x @ self.w.T
-        
+
         return self.act.fn(self.z)
 
 class network:
@@ -89,7 +87,7 @@ class network:
         for i, layer in enumerate(reversed(self.layers)):
             # First step of chain rule to "unwrap" activation function
             # These values are shape (instances x neruons)
-            
+
             dL_dz = layer.act.der(layer.z) * dL_da
 
             # Derivative with respect to w_jk is just x_k
@@ -125,38 +123,25 @@ class network:
     def get_loss(self) -> float:
         return np.mean(self.loss_fn.fn(self.y, self.y_hat))
 
-    def learn(self,
-        epochs:int = None,
-        delta:float = None,
-        showProgress:int = 0
-    ):
-        if (epochs is None) and (delta is None):
-            raise ValueError(
-                "Must specify epochs to learn over or delta to consider convergance under"
-            )
-
+    def learn(self, epochs:int = 1):
         # Give initial reference point
         self.forward_propagate()
-    
-        accuracy = [] # collection of prediction accuracy for each epoch
+
+        # Collection of prediction accuracy for each epoch
+        accuracy = []
         loss = []
 
         if epochs:
-            for i in range(1, epochs + 1):
+            for _ in range(1, epochs + 1):
                 self.backward_propagate()
-                a = self.forward_propagate()
-                # sort output from the final round of forward prop as 1s or 0s
-                a = np.apply_along_axis(lambda x : 0 if x < 0.5 else 1, 1, a)
-                
-                # intermediate array, keeps track of correct (1s) and faulty (0s) predictions for the given epoch 
-                acc = []
-                for j in range (len(self.y)):
-                    acc.append(1 if a[j] == self.y[j] else 0)
-                accuracy.append(np.sum(acc)/len(self.y))
-                
+                self.forward_propagate()
+
+                # Predicted output after each epoch
+                predicted = np.around(self.y_hat)
+
+                # Accuracy is percentage of correct guesses
+                # Equivalent to average here because values are 1 or 0
+                accuracy.append(np.mean(predicted == self.y))
                 loss.append(self.get_loss())
 
         return accuracy, loss
-
-        # TODO: delta convergance
-
