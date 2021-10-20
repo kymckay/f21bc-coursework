@@ -22,8 +22,8 @@ class layer:
         self.nf += 1
 
         # w_jk = weight from input k to node j
-        # multiply initial weight values by 0.01 to prevent exponent overflow in the sigmoid function in the final layer when useing relu funcs
-        self.w = np.random.rand(self.nodes, self.nf) * 0.01
+        # initialise weights as Gaussian random variables with mean 0 and SD 1/sqrt(nr_nodes_in_previous_layer)
+        self.w = np.array(np.random.randn(self.nodes, self.nf)/np.sqrt(self.nf))
 
     # values: numpy matrix (instances x features)
     # returns: numpy matrix (instances x neurons)
