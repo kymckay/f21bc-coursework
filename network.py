@@ -27,7 +27,7 @@ class layer:
 
     # values: numpy matrix (instances x features)
     # returns: numpy matrix (instances x neurons)
-    def activate(self, values):
+    def activate(self, values, remember=False):
         if self.first_run:
             self.init_weights(values.shape)
             self.first_run = False
@@ -36,10 +36,15 @@ class layer:
         b = np.ones((self.ni, 1))
 
         # Save input values for use in back prop
-        self.x = np.concatenate((values, b), axis=1)
+        x = np.concatenate((values, b), axis=1)
 
         # Save intermediate output for use in back prop
-        self.z = self.x @ self.w.T
+        z = x @ self.w.T
+
+        # Need to recall these values for back propagation in training
+        if remember:
+            self.x = x
+            self.z = z
 
         return self.act.fn(self.z)
 
@@ -69,11 +74,12 @@ class network:
 
     def forward_propagate(self):
         for l, layer in enumerate(self.layers):
+            # Want the layers to remember the input and intermediate
+            # results for later back propegation when training
             if l == 0:
-                self.y_hat = layer.activate(self.x)
+                self.y_hat = layer.activate(self.x, remember=True)
             else:
-                # Each layer saves the input it recieved for back prop
-                self.y_hat = layer.activate(self.y_hat)
+                self.y_hat = layer.activate(self.y_hat, remember=True)
         return self.y_hat
 
     def backward_propagate(self):
@@ -123,7 +129,7 @@ class network:
     def get_loss(self) -> float:
         return np.mean(self.loss_fn.fn(self.y, self.y_hat))
 
-    def learn(self, epochs:int = 1):
+    def train(self, epochs:int = 1):
         # Give initial reference point
         self.forward_propagate()
 
@@ -145,3 +151,14 @@ class network:
                 loss.append(self.get_loss())
 
         return np.array(accuracy), np.array(loss)
+
+    def test(self, input):
+        # Just forward propagation that doesn't effect training state
+        for l, layer in enumerate(self.layers):
+            if l == 0:
+                y_hat = layer.activate(input, remember=False)
+            else:
+                y_hat = layer.activate(self.y_hat, remember=False)
+
+        # Spit out the predictions
+        return np.around(y_hat)
