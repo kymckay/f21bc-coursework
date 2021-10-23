@@ -14,26 +14,25 @@ class layer:
         # Weights will be randomly initalised on first activation
         self.first_run = True
 
-    def init_weights(self, shape: Tuple[int,int]) -> None:
-        # Number of instances and features
-        self.ni, self.nf = shape
-
+    def init_weights(self, n_features: int) -> None:
         # bias will be considered an extra input
-        self.nf += 1
+        n_features += 1
 
         # w_jk = weight from input k to node j
         # initialise weights as Gaussian random variables with mean 0 and SD 1/sqrt(nr_nodes_in_previous_layer)
-        self.w = np.array(np.random.randn(self.nodes, self.nf)/np.sqrt(self.nf))
+        self.w = np.array(np.random.randn(self.nodes, n_features)/np.sqrt(n_features))
 
     # values: numpy matrix (instances x features)
     # returns: numpy matrix (instances x neurons)
     def activate(self, values, remember=False):
+        n_instances, n_features = values.shape
+
         if self.first_run:
-            self.init_weights(values.shape)
+            self.init_weights(n_features)
             self.first_run = False
 
         # Add bias as an extra input to reduce complexity
-        b = np.ones((self.ni, 1))
+        b = np.ones((n_instances, 1))
 
         # Save input values for use in back prop
         x = np.concatenate((values, b), axis=1)
@@ -46,7 +45,7 @@ class layer:
             self.x = x
             self.z = z
 
-        return self.act.fn(self.z)
+        return self.act.fn(z)
 
 class network:
     # inputs should be a matrix (instances x features)
@@ -152,7 +151,7 @@ class network:
                 accuracy.append(np.mean(predicted == self.y))
                 loss.append(self.get_loss(self.y, self.y_hat))
 
-                if test_x and test_y:
+                if (test_x is not None) and (test_y is not None):
                     test_prob = self.test(test_x)
                     test_pred = np.around(test_prob)
                     accuracy_test.append(np.mean(test_pred == test_y))
@@ -167,9 +166,9 @@ class network:
         # Just forward propagation that doesn't effect training state
         for l, layer in enumerate(self.layers):
             if l == 0:
-                y_hat = layer.activate(input, remember=False)
+                out = layer.activate(input, remember=False)
             else:
-                y_hat = layer.activate(y_hat, remember=False)
+                out = layer.activate(out, remember=False)
 
         # Spit out the probabilities
-        return y_hat
+        return out
