@@ -126,16 +126,18 @@ class network:
             # (instances x neurons in previous layer)
             dL_da = dL_dz @ dz_dx
 
-    def get_loss(self) -> float:
-        return np.mean(self.loss_fn.fn(self.y, self.y_hat))
+    def get_loss(self, expected, probabilities) -> float:
+        return np.mean(self.loss_fn.fn(expected, probabilities))
 
-    def train(self, epochs:int = 1):
+    def train(self, epochs:int = 1, test_x = None, test_y = None):
         # Give initial reference point
         self.forward_propagate()
 
         # Collection of prediction accuracy for each epoch
         accuracy = []
         loss = []
+        accuracy_test = []
+        loss_test = []
 
         if epochs:
             for _ in range(1, epochs + 1):
@@ -148,9 +150,18 @@ class network:
                 # Accuracy is percentage of correct guesses
                 # Equivalent to average here because values are 1 or 0
                 accuracy.append(np.mean(predicted == self.y))
-                loss.append(self.get_loss())
+                loss.append(self.get_loss(self.y, self.y_hat))
 
-        return np.array(accuracy), np.array(loss)
+                if test_x and test_y:
+                    test_prob = self.test(test_x)
+                    test_pred = np.around(test_prob)
+                    accuracy_test.append(np.mean(test_pred == test_y))
+                    loss_test.append(self.get_loss(test_y, test_prob))
+
+        return (
+            np.array(accuracy), np.array(loss),
+            np.array(accuracy_test), np.array(loss_test)
+        )
 
     def test(self, input):
         # Just forward propagation that doesn't effect training state
@@ -158,7 +169,7 @@ class network:
             if l == 0:
                 y_hat = layer.activate(input, remember=False)
             else:
-                y_hat = layer.activate(self.y_hat, remember=False)
+                y_hat = layer.activate(y_hat, remember=False)
 
-        # Spit out the predictions
-        return np.around(y_hat)
+        # Spit out the probabilities
+        return y_hat
