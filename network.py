@@ -1,13 +1,12 @@
 import funcs
 import numpy as np
-import pandas as pd
 from typing import Iterable, Tuple
 
 
 class layer:
     def __init__(self,
         nodes: int,
-        act: funcs.dfunc = funcs.sigmoid
+        act: funcs.dfunc = funcs.leaky_relu
     ) -> None:
         self.nodes = nodes
         self.act = act
@@ -15,33 +14,38 @@ class layer:
         # Weights will be randomly initalised on first activation
         self.first_run = True
 
-    def init_weights(self, shape: Tuple[int,int]) -> None:
-        # Number of instances and features
-        self.ni, self.nf = shape
-
+    def init_weights(self, n_features: int) -> None:
         # bias will be considered an extra input
-        self.nf += 1
+        n_features += 1
 
         # w_jk = weight from input k to node j
-        self.w = np.random.rand(self.nodes, self.nf)
+        # initialise weights as Gaussian random variables with mean 0 and SD 1/sqrt(nr_nodes_in_previous_layer)
+        self.w = np.array(np.random.randn(self.nodes, n_features)/np.sqrt(n_features))
 
     # values: numpy matrix (instances x features)
     # returns: numpy matrix (instances x neurons)
-    def activate(self, values):
+    def activate(self, values, remember=False):
+        n_instances, n_features = values.shape
+
         if self.first_run:
-            self.init_weights(values.shape)
+            self.init_weights(n_features)
             self.first_run = False
 
         # Add bias as an extra input to reduce complexity
-        b = np.ones((self.ni, 1))
+        b = np.ones((n_instances, 1))
 
         # Save input values for use in back prop
-        self.x = np.concatenate((values, b), axis=1)
+        x = np.concatenate((values, b), axis=1)
 
         # Save intermediate output for use in back prop
-        self.z = self.x @ self.w.T
+        z = x @ self.w.T
 
-        return self.act.fn(self.z)
+        # Need to recall these values for back propagation in training
+        if remember:
+            self.x = x
+            self.z = z
+
+        return self.act.fn(z)
 
 class network:
     # inputs should be a matrix (instances x features)
@@ -69,11 +73,12 @@ class network:
 
     def forward_propagate(self):
         for l, layer in enumerate(self.layers):
+            # Want the layers to remember the input and intermediate
+            # results for later back propegation when training
             if l == 0:
-                self.y_hat = layer.activate(self.x)
+                self.y_hat = layer.activate(self.x, remember=True)
             else:
-                # Each layer saves the input it recieved for back prop
-                self.y_hat = layer.activate(self.y_hat)
+                self.y_hat = layer.activate(self.y_hat, remember=True)
         return self.y_hat
 
     def backward_propagate(self):
@@ -87,6 +92,7 @@ class network:
         for i, layer in enumerate(reversed(self.layers)):
             # First step of chain rule to "unwrap" activation function
             # These values are shape (instances x neruons)
+
             dL_dz = layer.act.der(layer.z) * dL_da
 
             # Derivative with respect to w_jk is just x_k
@@ -119,48 +125,50 @@ class network:
             # (instances x neurons in previous layer)
             dL_da = dL_dz @ dz_dx
 
-    def get_loss(self) -> float:
-        return np.mean(self.loss_fn.fn(self.y, self.y_hat))
+    def get_loss(self, expected, probabilities) -> float:
+        return np.mean(self.loss_fn.fn(expected, probabilities))
 
-    def learn(self,
-        epochs:int = None,
-        delta:float = None,
-        showProgress:int = 0
-    ):
-        if (epochs is None) and (delta is None):
-            raise ValueError(
-                "Must specify epochs to learn over or delta to consider convergance under"
-            )
-
+    def train(self, epochs:int = 1, test_x = None, test_y = None):
         # Give initial reference point
         self.forward_propagate()
-        print(f'0 epochs: loss = {self.get_loss()}')
+
+        # Collection of prediction accuracy for each epoch
+        accuracy = []
+        loss = []
+        accuracy_test = []
+        loss_test = []
 
         if epochs:
-            for i in range(1, epochs + 1):
+            for _ in range(1, epochs + 1):
                 self.backward_propagate()
                 self.forward_propagate()
 
-                if showProgress and (i % showProgress == 0):
-                    L = self.get_loss()
-                    print(f'{i} epochs: loss = {L}')
+                # Predicted output after each epoch
+                predicted = np.around(self.y_hat)
 
-        # TODO: delta convergance
+                # Accuracy is percentage of correct guesses
+                # Equivalent to average here because values are 1 or 0
+                accuracy.append(np.mean(predicted == self.y))
+                loss.append(self.get_loss(self.y, self.y_hat))
 
-def main():
-    # The input data (each row is an instance)
-    data = pd.read_csv("data_banknote_authentication.txt",
-        sep=",",
-        header=None,
-    )
-    x = data.iloc[:, 0:3].to_numpy()
-    y = data.iloc[:, 4].to_numpy()
+                if (test_x is not None) and (test_y is not None):
+                    test_prob = self.test(test_x)
+                    test_pred = np.around(test_prob)
+                    accuracy_test.append(np.mean(test_pred == test_y))
+                    loss_test.append(self.get_loss(test_y, test_prob))
 
-    n = network(x, [
-        layer(2),
-        layer(1),
-    ], y, alpha=0.1)
+        return (
+            np.array(accuracy), np.array(loss),
+            np.array(accuracy_test), np.array(loss_test)
+        )
 
-    n.learn(10000, showProgress=2000)
+    def test(self, input):
+        # Just forward propagation that doesn't effect training state
+        for l, layer in enumerate(self.layers):
+            if l == 0:
+                out = layer.activate(input, remember=False)
+            else:
+                out = layer.activate(out, remember=False)
 
-main()
+        # Spit out the probabilities
+        return out
