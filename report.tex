@@ -1,4 +1,4 @@
-\documentclass{article}
+\documentclass[12pt]{article}
 \usepackage[margin=2cm]{geometry}
 
 % for links
@@ -46,6 +46,7 @@
   \Large{Multi-layer Artificial Neural Network Implementation}
 \end{center}
 
+\vspace{-3em}
 \section{Introduction}
 
 The following specifies the implementation of an artifical neural
@@ -54,7 +55,6 @@ dataset. Hyperparameter tuning is explored via repeated rounds of
 training and testing before classification accuracy results are compared
 to draw insight on the influence of each hyperparameter.
 
-\vspace{-1em}
 \section{Program development rationale}
 
 The ANN was implemented in Python to make use of the NumPy library which
@@ -90,7 +90,6 @@ of input features (i.e., the number of nodes in the previous layer) and
 thus minimising the possibility of weight saturation -- an issue
 encountered when random weights were initially used \cite{Nielsen}.
 
-\vspace{-1em}
 \section{Methods}
 
 The ANN is trained and tested on the UCI banknote binary
