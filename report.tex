@@ -165,24 +165,29 @@ the inherent random variation in training.
 \section{Discussion and Conclusions}
 \vspace{-1.5em}
 
-The number of hidden layers negatively affects a network's learning rate as can be seen in Figure \ref{fig:layers}. Surprisingly, the model with 0 hidden layers (i.e. a perceptron) outperforms the more complex architectures, especially on the test set (Figure \ref{fig:layers}). It seems intuitive that initially arbitrary outputs from preceding layers introduces more epochs to equivalently adjust the weights of following layers. Nonetheless, the model with the single node generalises unexpectedly well to unseen data which is likely a reflection of the simplified dataset used.
+The number of hidden layers negatively affects a network's learning rate as can be seen in Figure \ref{fig:layers}. Surprisingly, the model with 0 hidden layers (i.e. a perceptron) outperforms the more complex architectures, especially on the test set (Figure \ref{fig:layers}). It seems intuitive that initially arbitrary outputs from preceding layers demands more epochs to equivalently adjust the weights of following layers. Nonetheless, the model with the single node generalises unexpectedly well to unseen data which is likely a reflection of the simple dataset used.
 
 Conversely, the number of nodes has a reverse effect on the model's accuracy -- increasing the number of nodes improves the model's performance and ability to generalise to unseen data. Models with fewer nodes are more prone to overfit the data especially in the earlier epochs, characterised by the decreasing accuracy when using testing data (see Figure \ref{fig:nodes}).
 
-The choice of activation function is critical to the model's performance, best demonstrated by the sigmoid model (Figure \ref{fig:funcs}). In the 40 to 120 epoch range sigmoid function gets 'stuck' and learning stalls, surprisingly the 40 epoch mark is also when the sigmoid model starts to generalise to the test dataset after severe overfitting up to that point. Nonetheless, by the end of  the 200 epochs, sigmoid model's accuracy is only slightly better than chance, very different from the 0.8 accuracy of the training dataset - a sign of overfitting and overall poor generalisation to unseen data.
-Somewhat unexpected is the performance of the Tanh function which is comparable to and even surpasses the ReLU models in terms of accuracy, however this likely reflects the simplicity of this particular classification problem.
+The choice of activation function is critical to the model's performance, best demonstrated by the sigmoid model (Figure \ref{fig:funcs}). In the 40 to 120 epoch range sigmoid function gets `stuck' and learning stalls, surprisingly the 40 epoch mark is also when the sigmoid model starts to generalise to the test dataset after severe overfitting up to that point. Nonetheless, by the end of  the 200 epochs, sigmoid model's accuracy is only slightly better than chance, very different from the 0.8 accuracy of the training dataset - a sign of overfitting and overall poor generalisation to unseen data.
+Somewhat unexpected is the performance of the tanh function which is comparable to and even surpasses the ReLU models in terms of accuracy, however this likely reflects the simplicity of this particular classification problem.
 
-A linear relationship between average training time and the number of nodes per hidden layer, as well as the number of hidden layers is observed (Figure \ref{fig:times}). Unexpected is the comparison between training times of models with different activation functions, with Tanh and Sigmoid outperforming the ReLU functions, since ReLU functions forgo the need for expensive exponent computations and divisions, designed to improve computation performance \cite{Niwa}. The results could be explained by the simplified dataset and network architecture used, with the performance benefits of ReLU and its variants becoming evident in more complex networks and classification problems.
+A linear relationship between average training time and the number of nodes per hidden layer, as well as the number of hidden layers is observed (Figure \ref{fig:times}). Unexpected is the comparison between training times of models with different activation functions, with tanh and sigmoid outperforming the ReLU functions. ReLU functions are expected to perform better since they are designed to improve computation performance by forgoing the need for expensive exponent computations \cite{Niwa}. The results could be explained by the simplified dataset and network architecture used, with the performance benefits of ReLU and its variants becoming evident only in more complex networks and classification problems.
 
-Interestingly, training time is unaffected by the model's learning rate. When investigating alpha values further, dips in accuracy are observed, when using very small $\alpha$ values. Perhaps, due to the small gradient, the model gets stuck in a local minima, the minima is likely shallow which larger $\alpha$ values have no trouble escaping, hence the lack of dips in accuracy (see if this changes when the train/test sets are introduced (i.e., training set is reduced) which might have an effect on the landscape of the loss function \cite{Guo}).
+Investigation into varied learning rate values obtained the intuative results that large alpha values learn quicker. Experiments are ran for significantly
+greater numbers of epochs to observe how long all poorly performing models might take to reach the same accuracy as the best performing. Here it is observed that all models eventually converge to 100\% accuracy using the training data. As the number of epochs increased, sudden jumps in accuracy are found to occur -- the reason for this is unclear.
 
-In retrospect, implementing adaptive learning rate and alternative weight initialisation approaches (e.g. Xavier) could have benefited to a more robust classifier.
+Infrequently it is found that exponent overflow occurs during training,
+it is speculated to be a symptom of exploding gradient.
+
+In retrospect, implementing stochastic gradient descent and alternative
+weight initialisation approaches (e.g. Xavier) could have produced a
+more performant classifier.
 
 \vspace{-1.5em}
 \begin{thebibliography}{10}
 \bibitem{Nielsen} Michael A. Nielsen, ``Neural Networks and Deep Learning", Determination Press, 2015
-\bibitem{Xavier}Xavier Glorot, Yoshua Bengio, ``Proceedings of the Thirteenth International Conference on Artificial Intelligence and Statistics", PMLR 9:249-256, 2010
-\bibitem{Guo}  Yangzi Guo, Adrian Barbu, ``A study of local optima for learning feature interactions using neural networks", 2020
+\bibitem{Xavier} Xavier Glorot, Yoshua Bengio, ``Proceedings of the Thirteenth International Conference on Artificial Intelligence and Statistics", PMLR 9:249-256, 2010
 \bibitem{Niwa} Chigozie Nwankpa, Winifred Ijomah, Anthony Gachagan, \& Stephen Marshall, ``Activation Functions: Comparison of trends in Practice and Research for Deep Learning'', 2018
 
 \end{thebibliography}
