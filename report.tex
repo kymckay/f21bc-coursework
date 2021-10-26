@@ -124,13 +124,6 @@ Input normalisation - normal data vs feature standardised data (would have to be
   \label{fig:funcs}
 \end{figure}
 
-The number of hidden layers negatively affects a network's learning rate, hence the lower accuracies as the number of hidden layers increases. Surprisingly the model with 0 hidden layers (i.e., a single output node) outperforms the more complex architectures, especially on the test set (Figure 1). Inherently, any weight updates in a network with multiple layers will take more time to travel through the network and contribute to meaningful performance improvements, hence the decreased learning rate, nonetheless the model with the single node generalises unexpectedly well to unseen data which is likely a reflection of the simplified dataset used.
-
-Conversely, the number of nodes has a reverse effect on the model's accuracy, increasing the number of  nodes improves the model's performance and ability to generalise to unseen data. Models with fewer nodes are more prone to overfit the data especially in the earlier epochs, characterised by the decreasing accuracy when using testing data (Figure 2).
-
-The choice of activation function is critical to the model's performance, best demonstrated by the sigmoid model (Figure 3). In the 40 to 120 epoch range singmoid function gets 'stuck' and learning stalls, surprisingly the 40 epoch mark is also when the sigmoid model starts to generalise to the test dataset after severe overfitting up to that point. Nonetheless, by the end of  the 200 epochs, sigmoid model's accuracy is only slightly better than chance, very different from the 0.8 accuracy of the training dataset - a sign of overfitting and overall poor generalisation to unseen data.
-Somewhat unexpected is the performance of the Tanh function which is comparable to and even surpasses the ReLU models in terms of accuracy, however this likely reflects the simplicity of this particular clasisfication problem. 
-
 \begin{figure}[H]
   \centering
   \includegraphics[width=\textwidth]{figs/times.png}
@@ -143,18 +136,24 @@ Somewhat unexpected is the performance of the Tanh function which is comparable 
   \label{fig:times}
 \end{figure}
 
-A linear relationship between average training time and the number of nodes per hidden layer, as well as the number of hidden layers is observed (Figure 4). Unexpected is the comparison between training times of models with different activation functions, with Tanh and Sigmoid outperforming the ReLU functions, since ReLU functions forgo the need for expensive exponent computations and divisions, designed to improve computation performance \cite{Niwa}. The results could be explained by the simplified dataset and network architecture used, with the performance benefits of ReLU and its variants becoming evident in more complex networks and classification problems.
-
-Interestingly, training time is unaffected by the model's learning rate. When investigating alpha values further, dips in accuracy are observed, when using very small $\alpha$ values. Perhaps, due to the small gradient, the model gets stuck in a local minima, the minima is likely shallow which larger $\alpha$ values have no trouble escaping, hence the lack of dips in accuracy (see if this changes when the train/test sets are introduced (i.e., training set is reduced) which might have an effect on the landscape of the loss function \cite{Guo}). 
-
 \section{Discussion and Conclusions}
+
+The number of hidden layers negatively affects a network's learning rate as can be seen in \ref{fig:layers}. Surprisingly, the model with 0 hidden layers (i.e. a perceptron) outperforms the more complex architectures, especially on the test set (\ref{fig:layers}). It seems intuative that initially arbitrary ouputs from preceding layers introduces more epochs to equivalently adjust the weights of following layers. Nonetheless, the model with the single node generalises unexpectedly well to unseen data which is likely a reflection of the simplified dataset used.
+
+Conversely, the number of nodes has a reverse effect on the model's accuracy -- increasing the number of nodes improves the model's performance and ability to generalise to unseen data. Models with fewer nodes are more prone to overfit the data especially in the earlier epochs, characterised by the decreasing accuracy when using testing data (see \ref{fig:nodes}).
+
+The choice of activation function is critical to the model's performance, best demonstrated by the sigmoid model (\ref{fig:funcs}). In the 40 to 120 epoch range singmoid function gets 'stuck' and learning stalls, surprisingly the 40 epoch mark is also when the sigmoid model starts to generalise to the test dataset after severe overfitting up to that point. Nonetheless, by the end of  the 200 epochs, sigmoid model's accuracy is only slightly better than chance, very different from the 0.8 accuracy of the training dataset - a sign of overfitting and overall poor generalisation to unseen data.
+Somewhat unexpected is the performance of the Tanh function which is comparable to and even surpasses the ReLU models in terms of accuracy, however this likely reflects the simplicity of this particular clasisfication problem.
+
+A linear relationship between average training time and the number of nodes per hidden layer, as well as the number of hidden layers is observed (\ref{fig:times}). Unexpected is the comparison between training times of models with different activation functions, with Tanh and Sigmoid outperforming the ReLU functions, since ReLU functions forgo the need for expensive exponent computations and divisions, designed to improve computation performance \cite{Niwa}. The results could be explained by the simplified dataset and network architecture used, with the performance benefits of ReLU and its variants becoming evident in more complex networks and classification problems.
+
+Interestingly, training time is unaffected by the model's learning rate. When investigating alpha values further, dips in accuracy are observed, when using very small $\alpha$ values. Perhaps, due to the small gradient, the model gets stuck in a local minima, the minima is likely shallow which larger $\alpha$ values have no trouble escaping, hence the lack of dips in accuracy (see if this changes when the train/test sets are introduced (i.e., training set is reduced) which might have an effect on the landscape of the loss function \cite{Guo}).
+
 Sigmoid and Tanh functions are sensitive to input in their mid-point range (where y = 0.5 and y =0.0 respectively), anything below or above theses values quickly reduces the learning rate (output value close to 0 or 1, any changes to weights have very minor impact) and eventually saturates the gradient.
 Tanh output range of -1 to 1 has the advantage of adjusting weights in both positive or negative direction in a single iteration as opposed to sigmoid (justification for improved performance of tanh over sigmoid, reference?).
 Rectified learning unit function forgoes learning slowdown encountered by sigmoid and tanh when very large inputs are used (ReLU has no upper limit), however negatively weighted inputs cause neurons to die off, stopping learning altogether. Leaky ReLU (an improved version of ReLU) addresses the issue of dying nodes by assigning negative inputs a small negative value (reference?)..
 
 In retrospect, implementing adaptive learning rate and alternative weight initialisation approaches (e.g. Xavier) could have benefited to a more robust classifier.
-
-
 
 \begin{thebibliography}{10}
 \bibitem{Nielsen} Michael A. Nielsen, ``Neural Networks and Deep Learning", Determination Press, 2015
