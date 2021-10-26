@@ -89,7 +89,13 @@ The ANN is trained and tested on the UCI banknote binary
 classification dataset to evaluate how well it can perform and the
 influence of hyperparameter selection.
 
-% Tain test split reasoning (to see true performance for overfitting)
+Before any training occurs the dataset is split (unstratified, it is
+assumed the data has a relatively even class distribution) and 20\%
+is reserved for testing. This is done so that a better sense of the
+true classification accuracy can be obtained by comparing predictions
+for the test data aginst predictions for the train data -- to check for
+overfitting.
+
 % Baseline hyperparameters set after intial informat exploration
 % Hyperparameters and varied one at a time (citations)
 % Results averaged over 10 iterations to account for random variance
