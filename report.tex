@@ -56,7 +56,7 @@ The implementation was realised as a pair of classes: \texttt{layer}
 and \texttt{network}. This decision was made from the start because
 it was noticed that propagation across the whole network (in either
 direction) can be considered as propagation across a single layer at a
-time in sequence. In this way a generalisable implementation can be
+time in sequence. In this way a generalised implementation can be
 achieved to later allow very easy modification of hyperparameters.
 
 Propagation itself is achieved through carefully considered matrix
@@ -97,14 +97,14 @@ for the test data against predictions for the train data -- to check for
 overfitting.
 
 Following this, an informal investigation is carried out to find initial
-values of hyperparameters that appear to classify the dataset resosnably
-well. The baseline model (before variation) is subsequentally set to
+values of hyperparameters that appear to classify the dataset reasonably
+well. The baseline model (before variation) is subsequently set to
 have a learning rate of 0.1; 2 hidden layers, each with 4 nodes,
 each using the Leaky ReLU activation function. ReLU function forgoes learning slowdown encountered by sigmoid and tanh when very large inputs are used (ReLU has no upper limit), however negatively weighted inputs cause neurons to die off, stopping learning altogether. Leaky ReLU (an improved version of ReLU) addresses the issue of dying nodes by assigning negative inputs a small negative value, hence the use of Leaky ReLU as the default activation function \cite{Niwa}.
 
 With the baseline hyperparameters set, each is varied in turn. The
 learning rate in the range 0.005--0.2 \cite{Nielsen}; the number of hidden layers in
-the range 0-4 \cite{Xavier}; the number of nodes (in all hiden layers) in the range
+the range 0-4 \cite{Xavier}; the number of nodes (in all hidden layers) in the range
 1-5; and the activation function is tried as Sigmoid, tanh, ReLu and
 Leaky ReLu \cite{Niwa}.
 
@@ -152,7 +152,7 @@ the inherent random variation in training.
   \includegraphics[width=0.9\textwidth]{figs/times.png}
   \caption{
     Average training time of each model across 10 iterations.
-    Modified hyperparameter abbraviation identifies each model:
+    Modified hyperparameter abbreviation identifies each model:
     L = hidden layers, N = nodes, S|T|R|LR = activation function,
     A = learning rate.
   }
@@ -163,12 +163,12 @@ the inherent random variation in training.
 \section{Discussion and Conclusions}
 \vspace{-1.5em}
 
-The number of hidden layers negatively affects a network's learning rate as can be seen in Figure \ref{fig:layers}. Surprisingly, the model with 0 hidden layers (i.e. a perceptron) outperforms the more complex architectures, especially on the test set (Figure \ref{fig:layers}). It seems intuative that initially arbitrary ouputs from preceding layers introduces more epochs to equivalently adjust the weights of following layers. Nonetheless, the model with the single node generalises unexpectedly well to unseen data which is likely a reflection of the simplified dataset used.
+The number of hidden layers negatively affects a network's learning rate as can be seen in Figure \ref{fig:layers}. Surprisingly, the model with 0 hidden layers (i.e. a perceptron) outperforms the more complex architectures, especially on the test set (Figure \ref{fig:layers}). It seems intuitive that initially arbitrary outputs from preceding layers introduces more epochs to equivalently adjust the weights of following layers. Nonetheless, the model with the single node generalises unexpectedly well to unseen data which is likely a reflection of the simplified dataset used.
 
 Conversely, the number of nodes has a reverse effect on the model's accuracy -- increasing the number of nodes improves the model's performance and ability to generalise to unseen data. Models with fewer nodes are more prone to overfit the data especially in the earlier epochs, characterised by the decreasing accuracy when using testing data (see Figure \ref{fig:nodes}).
 
-The choice of activation function is critical to the model's performance, best demonstrated by the sigmoid model (Figure \ref{fig:funcs}). In the 40 to 120 epoch range singmoid function gets 'stuck' and learning stalls, surprisingly the 40 epoch mark is also when the sigmoid model starts to generalise to the test dataset after severe overfitting up to that point. Nonetheless, by the end of  the 200 epochs, sigmoid model's accuracy is only slightly better than chance, very different from the 0.8 accuracy of the training dataset - a sign of overfitting and overall poor generalisation to unseen data.
-Somewhat unexpected is the performance of the Tanh function which is comparable to and even surpasses the ReLU models in terms of accuracy, however this likely reflects the simplicity of this particular clasisfication problem.
+The choice of activation function is critical to the model's performance, best demonstrated by the sigmoid model (Figure \ref{fig:funcs}). In the 40 to 120 epoch range sigmoid function gets 'stuck' and learning stalls, surprisingly the 40 epoch mark is also when the sigmoid model starts to generalise to the test dataset after severe overfitting up to that point. Nonetheless, by the end of  the 200 epochs, sigmoid model's accuracy is only slightly better than chance, very different from the 0.8 accuracy of the training dataset - a sign of overfitting and overall poor generalisation to unseen data.
+Somewhat unexpected is the performance of the Tanh function which is comparable to and even surpasses the ReLU models in terms of accuracy, however this likely reflects the simplicity of this particular classification problem.
 
 A linear relationship between average training time and the number of nodes per hidden layer, as well as the number of hidden layers is observed (Figure \ref{fig:times}). Unexpected is the comparison between training times of models with different activation functions, with Tanh and Sigmoid outperforming the ReLU functions, since ReLU functions forgo the need for expensive exponent computations and divisions, designed to improve computation performance \cite{Niwa}. The results could be explained by the simplified dataset and network architecture used, with the performance benefits of ReLU and its variants becoming evident in more complex networks and classification problems.
 
