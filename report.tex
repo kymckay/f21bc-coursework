@@ -34,8 +34,9 @@
   \Large{Multi-layer Artificial Neural Network Implementation}
 \end{center}
 
-\vspace{-3em}
+\vspace{-2em}
 \section{Introduction}
+\vspace{-1.5em}
 
 The following specifies the implementation of an artificial neural
 network, trained with backpropagation to fit a binary classification
@@ -43,7 +44,9 @@ dataset. Hyperparameter tuning is explored via repeated rounds of
 training and testing before classification accuracy results are compared
 to draw insight on the influence of each hyperparameter.
 
+\vspace{-1.5em}
 \section{Program development rationale}
+\vspace{-1.5em}
 
 The ANN was implemented in Python to make use of the NumPy library which
 provides convenient and fast matrix arithmetic implementations --
@@ -78,7 +81,9 @@ of input features (i.e., the number of nodes in the previous layer) and
 thus minimising the possibility of weight saturation -- an issue
 encountered when random weights were initially used \cite{Nielsen}.
 
+\vspace{-1.5em}
 \section{Methods}
+\vspace{-1.5em}
 
 The ANN is trained and tested on the UCI banknote binary
 classification dataset to evaluate how well it can perform and the
@@ -107,7 +112,9 @@ For each hyperparameter value investigated, the training and testing
 process is performed 10 times and the results averaged to account for
 the inherent random variation in training.
 
+\vspace{-1.5em}
 \section{Results}
+\vspace{-1.5em}
 
 \begin{figure}[H]
   \centering
@@ -152,7 +159,9 @@ the inherent random variation in training.
   \label{fig:times}
 \end{figure}
 
+\vspace{-1.5em}
 \section{Discussion and Conclusions}
+\vspace{-1.5em}
 
 The number of hidden layers negatively affects a network's learning rate as can be seen in Figure \ref{fig:layers}. Surprisingly, the model with 0 hidden layers (i.e. a perceptron) outperforms the more complex architectures, especially on the test set (Figure \ref{fig:layers}). It seems intuative that initially arbitrary ouputs from preceding layers introduces more epochs to equivalently adjust the weights of following layers. Nonetheless, the model with the single node generalises unexpectedly well to unseen data which is likely a reflection of the simplified dataset used.
 
@@ -167,6 +176,7 @@ Interestingly, training time is unaffected by the model's learning rate. When in
 
 In retrospect, implementing adaptive learning rate and alternative weight initialisation approaches (e.g. Xavier) could have benefited to a more robust classifier.
 
+\vspace{-1.5em}
 \begin{thebibliography}{10}
 \bibitem{Nielsen} Michael A. Nielsen, ``Neural Networks and Deep Learning", Determination Press, 2015
 \bibitem{Xavier}Xavier Glorot, Yoshua Bengio, ``Proceedings of the Thirteenth International Conference on Artificial Intelligence and Statistics", PMLR 9:249-256, 2010
