@@ -85,8 +85,8 @@ encountered when random weights were initially used \cite{Nielsen}.
 \vspace{-1.5em}
 
 The ANN is trained and tested on the UCI banknote binary
-classification dataset to evaluate how well it can perform and the
-influence of hyperparameter selection.
+classification dataset. This is to evaluate how well the network can
+perform and the influence of hyperparameter selection.
 
 Before any training occurs the dataset is split (unstratified, it is
 assumed the data has a relatively even class distribution) and 20\%
@@ -99,12 +99,15 @@ Following this, an informal investigation is carried out to find initial
 values of hyperparameters that appear to classify the dataset reasonably
 well. The baseline model (before variation) is subsequently set to
 have a learning rate of 0.1; 2 hidden layers, each with 4 nodes,
-each using the Leaky ReLU activation function. ReLU function forgoes learning slowdown encountered by sigmoid and tanh when very large inputs are used (ReLU has no upper limit), however negatively weighted inputs cause neurons to die off, stopping learning altogether. Leaky ReLU (an improved version of ReLU) addresses the issue of dying nodes by assigning negative inputs a small negative value, hence the use of Leaky ReLU as the default activation function \cite{Niwa}.
+each using the Leaky ReLU activation function. ReLU forgoes learning
+slowdown encountered by sigmoid and tanh when very large inputs are used
+because ReLU has no upper limit. However, negatively weighted inputs cause
+neurons to die off, stopping learning altogether. Leaky ReLU (an improved version of ReLU) addresses the issue of dying nodes by assigning negative inputs a small negative value, hence the use of Leaky ReLU as the default activation function \cite{Niwa}.
 
 With the baseline hyperparameters set, each is varied in turn. The
 learning rate in the range 0.005--0.2 \cite{Nielsen}; the number of hidden layers in
 the range 0-4 \cite{Xavier}; the number of nodes (in all hidden layers) in the range
-1-5; and the activation function is tried as Sigmoid, tanh, ReLu and
+1-5; and the activation function is tried as a sigmoid, tanh, ReLu and
 Leaky ReLu \cite{Niwa}.
 
 For each hyperparameter value investigated, the training and testing
