@@ -41,7 +41,7 @@
 \vspace{-3em}
 \section{Introduction}
 
-The following specifies the implementation of an artifical neural
+The following specifies the implementation of an artificial neural
 network, trained with backpropagation to fit a binary classification
 dataset. Hyperparameter tuning is explored via repeated rounds of
 training and testing before classification accuracy results are compared
@@ -92,21 +92,20 @@ Before any training occurs the dataset is split (unstratified, it is
 assumed the data has a relatively even class distribution) and 20\%
 is reserved for testing. This is done so that a better sense of the
 true classification accuracy can be obtained by comparing predictions
-for the test data aginst predictions for the train data -- to check for
+for the test data against predictions for the train data -- to check for
 overfitting.
 
 Following this, an informal investigation is carried out to find initial
-values of hyperparameters that appear to classify the dataset reaosnably
+values of hyperparameters that appear to classify the dataset resosnably
 well. The baseline model (before variation) is subsequentally set to
 have a learning rate of 0.1; 2 hidden layers, each with 4 nodes,
 each using the Leaky ReLU activation function.
 
-% TODO: citations / rationale
 With the baseline hyperparameters set, each is varied in turn. The
-learning rate in the range 0.005--0.2; the number of hidden layers in
-the range 0-4; the number of nodes (in all hiden layers) in the range
+learning rate in the range 0.005--0.2 \cite{Nielsen}; the number of hidden layers in
+the range 0-4 \cite{Xavier}; the number of nodes (in all hiden layers) in the range
 1-5; and the activation function is tried as Sigmoid, tanh, ReLu and
-Leaky ReLu.
+Leaky ReLu \cite{Niwa}.
 
 For each hyperparameter value investigated, the training and testing
 process is performed 10 times and the results averaged to account for
