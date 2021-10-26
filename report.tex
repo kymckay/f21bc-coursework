@@ -14,14 +14,6 @@
 % for equation environments
 \usepackage{amsmath}
 
-% for code snippets
-\usepackage{listings}
-
-% \begin{lstlisting}[language=Python]
-% \end{lstlisting}
-
-% \lstinputlisting[language=Octave]{BitXorMatrix.m}
-
 % For header and footer
 \usepackage{fancyhdr}
 \usepackage{float} % formats figures
@@ -61,8 +53,8 @@ The ANN was implemented in Python to make use of the NumPy library which
 provides convenient and fast matrix arithmetic implementations --
 needed to efficiently perform forward and backward propagation.
 
-The implementation was realised as a pair of classes: \lstinline{layer}
-and \lstinline{network}. This decision was made from the start because
+The implementation was realised as a pair of classes: \texttt{layer}
+and \texttt{network}. This decision was made from the start because
 it was noticed that propagation across the whole network (in either
 direction) can be considered as propagation across a single layer at a
 time in sequence. In this way a generalisable implementation can be
@@ -78,7 +70,7 @@ than looping through each.
 For convenience, the activation functions and loss function used by the
 network are configurable as parameters in the constructors of the layer
 and network respectively. These are realised as instances of the
-\lstinline{dfunc} class defined in funcs.py which just conveniently
+\texttt{dfunc} class defined in funcs.py which just conveniently
 packages the function and its first derivative together for later use.
 
 By default, cross entropy loss function is used, which outperforms
