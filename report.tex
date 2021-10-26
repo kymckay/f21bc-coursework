@@ -102,8 +102,16 @@ well. The baseline model (before variation) is subsequentally set to
 have a learning rate of 0.1; 2 hidden layers, each with 4 nodes,
 each using the Leaky ReLU activation function.
 
-% Hyperparameters and varied one at a time (citations)
-% Results averaged over 10 iterations to account for random variance
+% TODO: citations / rationale
+With the baseline hyperparameters set, each is varied in turn. The
+learning rate in the range 0.005--0.2; the number of hidden layers in
+the range 0-4; the number of nodes (in all hiden layers) in the range
+1-5; and the activation function is tried as Sigmoid, tanh, ReLu and
+Leaky ReLu.
+
+For each hyperparameter value investigated, the training and testing
+process is performed 10 times and the results averaged to account for
+the inherent random variation in training.
 
 \section{Results}
 
