@@ -92,15 +92,40 @@ Input normalisation - normal data vs feature standardised data (would have to be
 
 
 \section{Results}
-\subsection{Learning rate}
+
 
 \begin{figure}[H]
-\centering
-\includegraphics[width=0.49\textwidth]{figs/alphas_acc.png}
-\includegraphics[width=0.49\textwidth]{figs/alphas_loss.png}
-\caption{Performance metrics of a neural network during supervised learning with different learning rates.}
-\label{fig:perf_alpha}
+  \centering
+  \includegraphics[width=\textwidth]{figs/layers.png}
+  \caption{
+    Average accuracy across 10 iterations for varied number of hidden
+    layers.
+  }
+  \label{fig:layers}
 \end{figure}
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=\textwidth]{figs/nodes.png}
+  \caption{
+    Average accuracy across 10 iterations for varied number of nodes
+    in 2 hidden layers.
+  }
+  \label{fig:nodes}
+\end{figure}
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=\textwidth]{figs/funcs.png}
+  \caption{
+    Average accuracy across 10 iterations for differing activation
+    functions in 2 hidden layers each with 4 nodes and a learning rate
+    \alpha=0.1 .
+  }
+  \label{fig:funcs}
+\end{figure}
+
+\subsection{Learning rate}
 
 Interestingly, when using very small $\alpha$ values, dips in accuracy can be observed. Perhaps, due to the small gradient, the model gets stuck in a local minima, the minima is likely shallow which larger $\alpha$ values have no trouble escaping, hence the lack of dips in accuracy (see if this changes when the train/test sets are introduced (i.e., training set is reduced) which might have an effect on the landscape of the loss function \cite{Guo}).
 
@@ -114,6 +139,18 @@ Rectified learning unit function forgoes learning slowdown encountered by sigmoi
 Flatlining - the model gets stuck in a local optima (i.e. surrounded by steep loss function? consider the error landscape, might have saddle/ flat areas which are hard to escape).
 
 In retrospect, implementing adaptive learning rate and alternative weight initialisation approaches (e.g. Xavier) could have benefited to a more robust classifier.
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=\textwidth]{figs/times.png}
+  \caption{
+    Average training time of each model across 10 iterations.
+    Modified hyperparameter abbraviation identifies each model:
+    L = hidden layers, N = nodes, S|T|R|LR = activation function,
+    A = learning rate.
+  }
+  \label{fig:times}
+\end{figure}
 
 \begin{thebibliography}{10}
 \bibitem{Nielsen} Michael A. Nielsen, ``Neural Networks and Deep Learning", Determination Press, 2015
