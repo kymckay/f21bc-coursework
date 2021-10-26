@@ -85,26 +85,14 @@ encountered when random weights were initially used \cite{Nielsen}.
 
 \section{Methods}
 
-To train and test the model, UCI banknote authentication dataset is used.
-Baseline architecture of 2 hidden layers and 4 nodes per layer is used, motivated by the initial informal investigation of hyper-parameters and their effect on the model's performance, with the specified architecture yielding the best results.
-For the hidden layers, Leaky ReLU activation function is used to minimise the probability of gradient saturation and dying nodes., while for the output layer, sigmoid function is used to transform output into a suitable range (between 0 and 1) for error evaluation.
+The ANN is trained and tested on the UCI banknote binary
+classification dataset to evaluate how well it can perform and the
+influence of hyperparameter selection.
 
-Throughout the experiments baseline hyper-parameters are used unless otherwise specified.
-
-\subsection{Learning rate ($\alpha$)}
-
-1. Finding $\alpha$ threshold value - during initial hyperparameter exploration, a large random learning rate was chosen (e.g., 2.5), and after running the baseline model for 10 repetitions the average rate of loss in the first ~30 epochs was observed. If the rate of loss had an upward trajectory, the initial value was reduced and the experiment repeated until the maximum value of $\alpha$ with a decreasing loss is obtained.
-2. Using threshold $\alpha$ as the highest value, choose a range learning rates...
-
-\subsection{Activation functions}
-
-\subsection{Design hyperparameters}
-
- The number of nodes and the number of hidden layers (1, 2, 3, 4, 5 for layers and nodes, test all combos with reduced nr of epochs (25 combos in total) find which perform best, deep dive into those refer to \cite{Xavier} for why the number of hidden layers are limited to five. (possibly plot activation values per layer?)
-
-\subsection{Input Normalisation}
-Input normalisation - normal data vs feature standardised data (would have to be done when the train/ test data are there because we're trying to determine how well the model generalises based on the data it's been trained on).
-
+% Tain test split reasoning (to see true performance for overfitting)
+% Baseline hyperparameters set after intial informat exploration
+% Hyperparameters and varied one at a time (citations)
+% Results averaged over 10 iterations to account for random variance
 
 \section{Results}
 
