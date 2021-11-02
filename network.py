@@ -56,28 +56,40 @@ class network:
     ):
         layers = []
 
-        i_from = 0
+        w_start = 0
         for li in range(0, 2):
             n_inputs = n_features if li == 0 else 4
+
+            # Activation functions stored in reverse sequence at the
+            # end of the list
+            af_i = list_data[-li]
+
+            # Truncate index so ranges 0-1, 1-2, 2-3, 3-4 correspond to
+            # the various activation functions
+            act_func = [
+                funcs.sigmoid,
+                funcs.tanh,
+                funcs.relu,
+                funcs.leaky_relu
+            ][af_i // 1]
 
             layer_i = layer(
                 n_inputs,
                 4,
-                # TODO: act func changing
-                funcs.leaky_relu
+                act_func
             )
 
             # Layer weights stored sequentially at front of list
             # Remember these are unravelled so n_features * n_nodes
-            i_to = li * 4 ** 2 + n_features * 4
+            w_end = li * 4 ** 2 + n_features * 4
 
             layer_i.w = np.array(
-                list_data[i_from:i_to]).reshape( (4, n_inputs) )
+                list_data[w_start:w_end]).reshape( (4, n_inputs) )
 
             layers.append(layer_i)
 
             # Next layer weights start from end of current
-            i_from = i_to
+            w_start = w_end
 
     # expected_out should be an array of length (instances)
     def __init__(self,
