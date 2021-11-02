@@ -91,6 +91,13 @@ class network:
             # Next layer weights start from end of current
             w_start = w_end
 
+        # Output layer
+        layers.append(
+            layer(4, 1, funcs.sigmoid)
+        )
+
+        return network(layers)
+
     # expected_out should be an array of length (instances)
     def __init__(self,
         layers: Iterable[layer],
