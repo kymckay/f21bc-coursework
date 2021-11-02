@@ -53,44 +53,40 @@ class network:
     def from_list(props: Iterable[float], n_features: int):
         pass
 
-    # inputs should be a matrix (instances x features)
     # expected_out should be an array of length (instances)
     def __init__(self,
-        inputs,
         layers: Iterable[layer],
-        expected_out,
         alpha = 0.01,
         loss_fn: funcs.dfunc = funcs.log_loss,
     ) -> None:
         if len(layers) == 0:
             raise ValueError('Need at least one layer in the network')
-        if (
-            expected_out.ndim > 1
-            or layers[-1].nodes > 1
-        ):
+        if (layers[-1].nodes > 1):
             raise ValueError('More than one output not supported')
 
-        self.x = inputs
         self.layers = layers
-        self.y = expected_out[:, np.newaxis]
         self.alpha = alpha
         self.loss_fn = loss_fn
 
-    def forward_propagate(self):
+    # inputs should be a matrix (instances x features)
+    def forward_propagate(self, inputs, remember=False):
         for l, layer in enumerate(self.layers):
             # Want the layers to remember the input and intermediate
             # results for later back propegation when training
             if l == 0:
-                self.y_hat = layer.activate(self.x, remember=True)
+                y_hat = layer.activate(inputs, remember=remember)
             else:
-                self.y_hat = layer.activate(self.y_hat, remember=True)
-        return self.y_hat
+                y_hat = layer.activate(y_hat, remember=remember)
 
-    def backward_propagate(self):
+        # Spit out the probabilities
+        return y_hat
+
+    # outputs should be arrays of length (instances)
+    def backward_propagate(self, outputs, expected_outputs):
         # Derivative of loss function, with respect to
         # activation of current layer.
         # Shape (instances x neurons)
-        dL_da = self.loss_fn.der(self.y, self.y_hat)
+        dL_da = self.loss_fn.der(expected_outputs, outputs)
 
         # There are three dimensions to consider in all following:
         # instances, neurons, features (all of current layer)
@@ -112,7 +108,7 @@ class network:
 
             # Dividing by number of instances gets the average
             # Learning rate dictates rate of learning
-            layer.w = layer.w - self.alpha * dL_dw / self.x.shape[0]
+            layer.w = layer.w - self.alpha * dL_dw / outputs.shape[0]
 
             # Once input layer weights update, nothing left to do
             if i == len(self.layers) - 1:
@@ -133,9 +129,23 @@ class network:
     def get_loss(self, expected, probabilities) -> float:
         return np.mean(self.loss_fn.fn(expected, probabilities))
 
-    def train(self, epochs:int = 1, test_x = None, test_y = None):
-        # Give initial reference point
-        self.forward_propagate()
+    # inputs (x) should be a matrix (instances x features)
+    # outputs (y) should be arrays of length (instances)
+    def train(
+        self,
+        train_x,
+        train_y,
+        epochs:int = 1,
+        test_x = None,
+        test_y = None
+    ):
+        if train_y.ndim > 1:
+            raise ValueError('More than one output not supported')
+
+        train_y = train_y[:, np.newaxis]
+
+        if test_y is not None:
+            test_y = test_y[:, np.newaxis]
 
         # Collection of prediction accuracy for each epoch
         accuracy = []
@@ -143,21 +153,24 @@ class network:
         accuracy_test = []
         loss_test = []
 
+        # Give initial reference point
+        pred_y = self.forward_propagate(train_x, remember=True)
+
         if epochs:
             for _ in range(1, epochs + 1):
-                self.backward_propagate()
-                self.forward_propagate()
+                self.backward_propagate(pred_y, train_y)
+                pred_y = self.forward_propagate(train_x, remember=True)
 
                 # Predicted output after each epoch
-                predicted = np.around(self.y_hat)
+                predicted = np.around(pred_y)
 
                 # Accuracy is percentage of correct guesses
                 # Equivalent to average here because values are 1 or 0
-                accuracy.append(np.mean(predicted == self.y))
-                loss.append(self.get_loss(self.y, self.y_hat))
+                accuracy.append(np.mean(predicted == train_y))
+                loss.append(self.get_loss(train_y, pred_y))
 
                 if (test_x is not None) and (test_y is not None):
-                    test_prob = self.test(test_x)
+                    test_prob = self.forward_propagate(test_x)
                     test_pred = np.around(test_prob)
                     accuracy_test.append(np.mean(test_pred == test_y))
                     loss_test.append(self.get_loss(test_y, test_prob))
@@ -166,14 +179,3 @@ class network:
             np.array(accuracy), np.array(loss),
             np.array(accuracy_test), np.array(loss_test)
         )
-
-    def test(self, input):
-        # Just forward propagation that doesn't effect training state
-        for l, layer in enumerate(self.layers):
-            if l == 0:
-                out = layer.activate(input, remember=False)
-            else:
-                out = layer.activate(out, remember=False)
-
-        # Spit out the probabilities
-        return out
