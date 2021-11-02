@@ -47,11 +47,37 @@ class layer:
 
 class network:
     # Produces a new network from a list representation of properties
-    # The network architecture is fixed to 2 hidden layers of 4 nodes
-    # List length must be 4 * (n_features + 4 + 2 + 1)
+    # Currently fixed architecture of 2 layers of 4 nodes
+    # List length must be n_nodes * (n_features + n_nodes * (n_layers - 1) + 1) + n_layers
     @staticmethod
-    def from_list(props: Iterable[float], n_features: int):
-        pass
+    def from_list(
+        list_data: Iterable[float],
+        n_features: int
+    ):
+        layers = []
+
+        i_from = 0
+        for li in range(0, 2):
+            n_inputs = n_features if li == 0 else 4
+
+            layer_i = layer(
+                n_inputs,
+                4,
+                # TODO: act func changing
+                funcs.leaky_relu
+            )
+
+            # Layer weights stored sequentially at front of list
+            # Remember these are unravelled so n_features * n_nodes
+            i_to = li * 4 ** 2 + n_features * 4
+
+            layer_i.w = np.array(
+                list_data[i_from:i_to]).reshape( (4, n_inputs) )
+
+            layers.append(layer_i)
+
+            # Next layer weights start from end of current
+            i_from = i_to
 
     # expected_out should be an array of length (instances)
     def __init__(self,
