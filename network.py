@@ -16,8 +16,13 @@ class layer:
         n_features += 1
 
         # w_jk = weight from feature k to node j
-        # initialise weights as Gaussian random variables with mean 0 and SD 1/sqrt(nr_nodes_in_previous_layer)
-        self.w = np.array(np.random.randn(self.nodes, n_features)/np.sqrt(n_features))
+        # Initialise weights as Gaussian random variables with:
+        #   mean = 0
+        #   SD   = 1 / sqrt(<number of nodes in previous layer>)
+        self.w = (
+            np.random.randn(self.nodes, n_features) /
+            np.sqrt(n_features)
+        )
 
     # values: numpy matrix (instances x features)
     # returns: numpy matrix (instances x neurons)
