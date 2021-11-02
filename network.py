@@ -1,6 +1,6 @@
 import funcs
 import numpy as np
-from typing import Iterable, Tuple
+from typing import Iterable
 
 
 class layer:
@@ -48,6 +48,13 @@ class layer:
         return self.act.fn(z)
 
 class network:
+    # Produces a new network from a list representation of properties
+    # The network architecture is fixed to 2 hidden layers of 4 nodes
+    # List length must be 4 * (n_features + 4 + 2 + 1)
+    @staticmethod
+    def from_list(props: Iterable[float], n_features: int):
+        pass
+
     # inputs should be a matrix (instances x features)
     # expected_out should be an array of length (instances)
     def __init__(self,
