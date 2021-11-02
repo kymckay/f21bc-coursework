@@ -5,39 +5,31 @@ from typing import Iterable
 
 class layer:
     def __init__(self,
+        n_features: int,
         nodes: int,
         act: funcs.dfunc = funcs.leaky_relu
     ) -> None:
         self.nodes = nodes
         self.act = act
 
-        # Weights will be randomly initalised on first activation
-        self.first_run = True
-
-    def init_weights(self, n_features: int) -> None:
-        # bias will be considered an extra input
+        # bias will be considered an extra feature
         n_features += 1
 
-        # w_jk = weight from input k to node j
+        # w_jk = weight from feature k to node j
         # initialise weights as Gaussian random variables with mean 0 and SD 1/sqrt(nr_nodes_in_previous_layer)
         self.w = np.array(np.random.randn(self.nodes, n_features)/np.sqrt(n_features))
 
     # values: numpy matrix (instances x features)
     # returns: numpy matrix (instances x neurons)
     def activate(self, values, remember=False):
-        n_instances, n_features = values.shape
+        n_instances, _ = values.shape
 
-        if self.first_run:
-            self.init_weights(n_features)
-            self.first_run = False
-
-        # Add bias as an extra input to reduce complexity
+        # Add bias as an extra feature to reduce complexity
         b = np.ones((n_instances, 1))
-
-        # Save input values for use in back prop
         x = np.concatenate((values, b), axis=1)
 
-        # Save intermediate output for use in back prop
+        # Activation across all instances at once achieved via matrix
+        # multiplication
         z = x @ self.w.T
 
         # Need to recall these values for back propagation in training
@@ -45,6 +37,7 @@ class layer:
             self.x = x
             self.z = z
 
+        # Output dictated by the activation function
         return self.act.fn(z)
 
 class network:
