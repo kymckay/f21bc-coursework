@@ -182,7 +182,8 @@ class network:
         train_y,
         epochs:int = 1,
         test_x = None,
-        test_y = None
+        test_y = None,
+        target_accuracy = 0.95
     ):
         if train_y.ndim > 1:
             raise ValueError('More than one output not supported')
@@ -201,7 +202,7 @@ class network:
         # Give initial reference point
         pred_y = self.forward_propagate(train_x, remember=True)
 
-        if epochs:
+        if epochs is not None:
             for _ in range(1, epochs + 1):
                 self.backward_propagate(pred_y, train_y)
                 pred_y = self.forward_propagate(train_x, remember=True)
@@ -219,6 +220,31 @@ class network:
                     test_pred = np.around(test_prob)
                     accuracy_test.append(np.mean(test_pred == test_y))
                     loss_test.append(self.get_loss(test_y, test_prob))
+
+        # If epochs set to None, network is trained to specified accuracy target (0.95 by default) is achieved
+        else:
+            # Target accuracy is evaluated against the test dataset
+            if (test_x is not None) and (test_y is not None):
+                converged = False
+                current_accuracy = 0
+                repetition = 0
+
+                while converged == False:
+                    self.backward_propagate(pred_y, train_y)
+                    pred_y = self.forward_propagate(train_x, remember=True)
+
+                    test_prob = self.forward_propagate(test_x)
+                    test_pred = np.around(test_prob)
+                    current_accuracy = np.mean(test_pred == test_y)
+
+                    if (current_accuracy >= target_accuracy):
+                        # Target accuracy or above is maintained for 10 epochs
+                        if (repetition == 9):
+                            converged = True
+                        else:
+                            repetition+=1
+                    else:
+                        repetition = 1 
 
         return (
             np.array(accuracy), np.array(loss),
