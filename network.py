@@ -1,43 +1,40 @@
 import funcs
 import numpy as np
-from typing import Iterable, Tuple
+from typing import Iterable
 
 
 class layer:
     def __init__(self,
+        n_features: int,
         nodes: int,
         act: funcs.dfunc = funcs.leaky_relu
     ) -> None:
         self.nodes = nodes
         self.act = act
 
-        # Weights will be randomly initalised on first activation
-        self.first_run = True
-
-    def init_weights(self, n_features: int) -> None:
-        # bias will be considered an extra input
+        # bias will be considered an extra feature
         n_features += 1
 
-        # w_jk = weight from input k to node j
-        # initialise weights as Gaussian random variables with mean 0 and SD 1/sqrt(nr_nodes_in_previous_layer)
-        self.w = np.array(np.random.randn(self.nodes, n_features)/np.sqrt(n_features))
+        # w_jk = weight from feature k to node j
+        # Initialise weights as Gaussian random variables with:
+        #   mean = 0
+        #   SD   = 1 / sqrt(<number of nodes in previous layer>)
+        self.w = (
+            np.random.randn(self.nodes, n_features) /
+            np.sqrt(n_features)
+        )
 
     # values: numpy matrix (instances x features)
     # returns: numpy matrix (instances x neurons)
     def activate(self, values, remember=False):
-        n_instances, n_features = values.shape
+        n_instances, _ = values.shape
 
-        if self.first_run:
-            self.init_weights(n_features)
-            self.first_run = False
-
-        # Add bias as an extra input to reduce complexity
+        # Add bias as an extra feature to reduce complexity
         b = np.ones((n_instances, 1))
-
-        # Save input values for use in back prop
         x = np.concatenate((values, b), axis=1)
 
-        # Save intermediate output for use in back prop
+        # Activation across all instances at once achieved via matrix
+        # multiplication
         z = x @ self.w.T
 
         # Need to recall these values for back propagation in training
@@ -45,47 +42,96 @@ class layer:
             self.x = x
             self.z = z
 
+        # Output dictated by the activation function
         return self.act.fn(z)
 
 class network:
-    # inputs should be a matrix (instances x features)
+    # Produces a new network from a list representation of properties
+    # Currently fixed architecture of 2 layers of 4 nodes
+    # List length must be n_nodes * (n_features + n_nodes * (n_layers - 1) + 1) + n_layers
+    @staticmethod
+    def from_list(
+        list_data: Iterable[float],
+        n_features: int
+    ):
+        layers = []
+
+        w_start = 0
+        for li in range(0, 2):
+            n_inputs = n_features if li == 0 else 4
+
+            # Activation functions stored in reverse sequence at the
+            # end of the list
+            af_i = list_data[-li]
+
+            # Truncate index so ranges 0-1, 1-2, 2-3, 3-4 correspond to
+            # the various activation functions
+            act_func = [
+                funcs.sigmoid,
+                funcs.tanh,
+                funcs.relu,
+                funcs.leaky_relu
+            ][af_i // 1]
+
+            layer_i = layer(
+                n_inputs,
+                4,
+                act_func
+            )
+
+            # Layer weights stored sequentially at front of list
+            # Remember these are unravelled so n_features * n_nodes
+            w_end = li * 4 ** 2 + n_features * 4
+
+            layer_i.w = np.array(
+                list_data[w_start:w_end]).reshape( (4, n_inputs) )
+
+            layers.append(layer_i)
+
+            # Next layer weights start from end of current
+            w_start = w_end
+
+        # Output layer
+        layers.append(
+            layer(4, 1, funcs.sigmoid)
+        )
+
+        return network(layers)
+
     # expected_out should be an array of length (instances)
     def __init__(self,
-        inputs,
         layers: Iterable[layer],
-        expected_out,
         alpha = 0.01,
         loss_fn: funcs.dfunc = funcs.log_loss,
     ) -> None:
         if len(layers) == 0:
             raise ValueError('Need at least one layer in the network')
-        if (
-            expected_out.ndim > 1
-            or layers[-1].nodes > 1
-        ):
+        if (layers[-1].nodes > 1):
             raise ValueError('More than one output not supported')
 
-        self.x = inputs
         self.layers = layers
-        self.y = expected_out[:, np.newaxis]
         self.alpha = alpha
         self.loss_fn = loss_fn
 
-    def forward_propagate(self):
+    # inputs should be a matrix (instances x features)
+    def forward_propagate(self, inputs, remember=False):
         for l, layer in enumerate(self.layers):
             # Want the layers to remember the input and intermediate
             # results for later back propegation when training
             if l == 0:
-                self.y_hat = layer.activate(self.x, remember=True)
+                y_hat = layer.activate(inputs, remember=remember)
             else:
-                self.y_hat = layer.activate(self.y_hat, remember=True)
-        return self.y_hat
+                y_hat = layer.activate(y_hat, remember=remember)
 
-    def backward_propagate(self):
+        # Spit out the probabilities
+        return y_hat
+
+    # outputs should be arrays of length (instances)
+    def backward_propagate(self, outputs, expected_outputs):
         # Derivative of loss function, with respect to
         # activation of current layer.
         # Shape (instances x neurons)
-        dL_da = self.loss_fn.der(self.y, self.y_hat)
+        dL_da = self.loss_fn.der(expected_outputs, outputs)
 
         # There are three dimensions to consider in all following:
         # instances, neurons, features (all of current layer)
@@ -107,7 +153,7 @@ class network:
 
             # Dividing by number of instances gets the average
             # Learning rate dictates rate of learning
-            layer.w = layer.w - self.alpha * dL_dw / self.x.shape[0]
+            layer.w = layer.w - self.alpha * dL_dw / outputs.shape[0]
 
             # Once input layer weights update, nothing left to do
             if i == len(self.layers) - 1:
@@ -128,9 +174,23 @@ class network:
     def get_loss(self, expected, probabilities) -> float:
         return np.mean(self.loss_fn.fn(expected, probabilities))
 
-    def train(self, epochs:int = 1, test_x = None, test_y = None):
-        # Give initial reference point
-        self.forward_propagate()
+    # inputs (x) should be a matrix (instances x features)
+    # outputs (y) should be arrays of length (instances)
+    def train(
+        self,
+        train_x,
+        train_y,
+        epochs:int = 1,
+        test_x = None,
+        test_y = None
+    ):
+        if train_y.ndim > 1:
+            raise ValueError('More than one output not supported')
+
+        train_y = train_y[:, np.newaxis]
+
+        if test_y is not None:
+            test_y = test_y[:, np.newaxis]
 
         # Collection of prediction accuracy for each epoch
         accuracy = []
@@ -138,21 +198,24 @@ class network:
         accuracy_test = []
         loss_test = []
 
+        # Give initial reference point
+        pred_y = self.forward_propagate(train_x, remember=True)
+
         if epochs:
             for _ in range(1, epochs + 1):
-                self.backward_propagate()
-                self.forward_propagate()
+                self.backward_propagate(pred_y, train_y)
+                pred_y = self.forward_propagate(train_x, remember=True)
 
                 # Predicted output after each epoch
-                predicted = np.around(self.y_hat)
+                predicted = np.around(pred_y)
 
                 # Accuracy is percentage of correct guesses
                 # Equivalent to average here because values are 1 or 0
-                accuracy.append(np.mean(predicted == self.y))
-                loss.append(self.get_loss(self.y, self.y_hat))
+                accuracy.append(np.mean(predicted == train_y))
+                loss.append(self.get_loss(train_y, pred_y))
 
                 if (test_x is not None) and (test_y is not None):
-                    test_prob = self.test(test_x)
+                    test_prob = self.forward_propagate(test_x)
                     test_pred = np.around(test_prob)
                     accuracy_test.append(np.mean(test_pred == test_y))
                     loss_test.append(self.get_loss(test_y, test_prob))
@@ -161,14 +224,3 @@ class network:
             np.array(accuracy), np.array(loss),
             np.array(accuracy_test), np.array(loss_test)
         )
-
-    def test(self, input):
-        # Just forward propagation that doesn't effect training state
-        for l, layer in enumerate(self.layers):
-            if l == 0:
-                out = layer.activate(input, remember=False)
-            else:
-                out = layer.activate(out, remember=False)
-
-        # Spit out the probabilities
-        return out
