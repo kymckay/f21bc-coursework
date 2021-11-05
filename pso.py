@@ -77,6 +77,13 @@ class swarm:
         if len(min_values) != len(max_values):
             raise ValueError('PSO dimension bounds are mismatched')
 
+        self.__alpha = inertia_weight
+        self.__beta = cognative_weight
+        self.__gamma = social_weight
+        self.__epsilon = step_size
+        self.__min_bounds = min_values
+        self.__max_bounds = max_values
+
         space_dims = len(min_values)
 
         # np.random.rand has uniform distribution, distribute one big
@@ -116,4 +123,12 @@ class swarm:
                 p.add_informant(swarm_copy[i])
 
     def search(self):
-        pass
+        # Though this may look like additional looping, it is more
+        # efficient since updating all the bests first means the fitness
+        # values are cached for the informat information sharing step
+        for p in self.__swarm:
+            p.update_best()
+
+        for p in self.__swarm:
+            p.update_informed_best()
+            p.move(self.__epsilon, self.__min_bounds, self.__max_bounds)
