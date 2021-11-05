@@ -60,6 +60,20 @@ class particle:
 
         self.__pos = new_pos
 
+    # Importantly the velocity update apply a random coefficient to each
+    # dimensional component for stochastic behaviour
+    def steer(self, alpha, beta, gamma):
+        dims = len(self.__vel)
+
+        self.__vel = (
+            # Inertia component, want to go way already going
+            alpha * np.random.rand(dims) * self.__vel +
+            # Cognative component, want to explore near best known area
+            beta * np.random.rand(dims) * (self.__best - self.__pos) +
+            # Social component, want to explore near best group known area
+            gamma * np.random.rand(dims) * (self.__inf_best - self.__pos)
+        )
+
 class swarm:
     def __init__(
         self,
@@ -67,20 +81,12 @@ class swarm:
         min_values: np.array,
         max_values: np.array,
         swarm_size: int = 10,
-        inertia_weight: float = 1,
-        cognative_weight: float = 1,
-        social_weight: float = 1,
-        step_size: float = 0.5,
         num_informants: int = 3,
     ) -> None:
         # Sanity check
         if len(min_values) != len(max_values):
             raise ValueError('PSO dimension bounds are mismatched')
 
-        self.__alpha = inertia_weight
-        self.__beta = cognative_weight
-        self.__gamma = social_weight
-        self.__epsilon = step_size
         self.__min_bounds = min_values
         self.__max_bounds = max_values
 
@@ -122,7 +128,13 @@ class swarm:
             for i in range(num_informants):
                 p.add_informant(swarm_copy[i])
 
-    def search(self):
+    def search(
+        self,
+        alpha: float = 1, # Inertia weight
+        beta: float = 1, # Cognative weight
+        gamma: float = 1, # Social weight
+        epsilon: float = 0.5, # Step size
+    ) -> None:
         # Though this may look like additional looping, it is more
         # efficient since updating all the bests first means the fitness
         # values are cached for the informat information sharing step
@@ -131,4 +143,5 @@ class swarm:
 
         for p in self.__swarm:
             p.update_informed_best()
-            p.move(self.__epsilon, self.__min_bounds, self.__max_bounds)
+            p.steer(alpha, beta, gamma)
+            p.move(epsilon, self.__min_bounds, self.__max_bounds)
