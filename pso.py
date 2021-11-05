@@ -27,15 +27,24 @@ class swarm:
         # Specifies the desired bounds of the search space
         min_values: np.array,
         max_values: np.array,
-        swarm_size:int = 10,
+        swarm_size: int = 10,
+        inertia_weight: float = 1,
+        cognative_weight: float = 1,
+        social_weight: float = 1,
+        step_size: float = 0.5,
+        num_informants: int = 3,
     ) -> None:
+        # Sanity check
+        if len(min_values) != len(max_values):
+            raise ValueError('PSO dimension bounds are mismatched')
+
         space_dims = len(min_values)
 
         # np.random.rand has uniform distribution, distribute one big
         # coordinate list so particles are positioned uniformly to start
         coords = np.random.rand(space_dims * swarm_size)
 
-        self.swarm = []
+        self.__swarm = []
         for i in range(swarm_size):
             # Map initial uniform [0,1) position to dimension bounds
             position = (
@@ -47,7 +56,7 @@ class swarm:
             # TODO: may need to find suitable initial values for this
             velocity = np.random.rand(space_dims)
 
-            self.swarm.append(particle(
+            self.__swarm.append(particle(
                 position,
                 velocity,
             ))
