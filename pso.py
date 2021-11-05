@@ -1,3 +1,5 @@
+import network
+import dataset
 import numpy as np
 
 class particle:
@@ -11,6 +13,7 @@ class particle:
 
         # Best position so far
         self.__best = position
+        self.__best_fit = self.fitness()
 
         # Best position known to informants so far
         self.__inf_best = position
@@ -18,8 +21,22 @@ class particle:
         # Informants used to update social knowledge
         self.__informants = []
 
+    def fitness(self):
+        net = network.network.from_list(self.__pos)
+        y_pred = net.forward_propagate(dataset.x)
+
+        # Loss is best minimised so negate for fitness
+        return -net.get_loss(dataset.y, y_pred)
+
     def add_informant(self, informant: 'particle') -> None:
         self.__informants.append(informant)
+
+    def update_best(self):
+        fitness = self.fitness()
+
+        if fitness > self.__best_fit:
+            self.__best = self.__pos
+            self.__best_fit = fitness
 
 class swarm:
     def __init__(
