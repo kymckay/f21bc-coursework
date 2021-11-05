@@ -52,6 +52,14 @@ class particle:
     def get_best(self) -> np.array:
         return self.__best, self.__best_fit
 
+    def move(self, epsilon, min_bounds, max_bounds):
+        new_pos = self.__pos + epsilon * self.__vel
+
+        # TODO: Other methods of handling bounds
+        new_pos = np.minimum(np.maximum(new_pos, min_bounds), max_bounds)
+
+        self.__pos = new_pos
+
 class swarm:
     def __init__(
         self,
