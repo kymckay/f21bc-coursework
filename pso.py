@@ -38,6 +38,20 @@ class particle:
             self.__best = self.__pos
             self.__best_fit = fitness
 
+    # For efficiency, can only update informant best after all particles
+    # update their own best (avoids repeatedly finding their fitness)
+    def update_informed_best(self):
+        best_fit = -np.inf
+
+        for p in self.__informants:
+            p_best, p_fit = p.get_best()
+            if p_fit > best_fit:
+                best_fit = p_fit
+                self.__inf_best = p_best
+
+    def get_best(self) -> np.array:
+        return self.__best, self.__best_fit
+
 class swarm:
     def __init__(
         self,
