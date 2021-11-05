@@ -51,9 +51,12 @@ class network:
     # List length must be n_nodes * (n_features + n_nodes * (n_layers - 1) + 1) + n_layers
     @staticmethod
     def from_list(
-        list_data: Iterable[float],
+        list_data: np.array,
         n_features: int
     ):
+        if len(list_data) != 4 * (n_features + 4 + 1) + 2:
+            raise ValueError('ANN list representation of wrong length')
+
         layers = []
 
         w_start = 0
@@ -83,8 +86,7 @@ class network:
             # Remember these are unravelled so n_features * n_nodes
             w_end = li * 4 ** 2 + n_features * 4
 
-            layer_i.w = np.array(
-                list_data[w_start:w_end]).reshape( (4, n_inputs) )
+            layer_i.w = list_data[w_start:w_end].reshape((4, n_inputs))
 
             layers.append(layer_i)
 
