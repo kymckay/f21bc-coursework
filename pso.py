@@ -6,9 +6,20 @@ class particle:
         position: np.array,
         velocity: np.array,
     ) -> None:
-        self.pos = position
-        self.velocity = velocity
+        self.__pos = position
+        self.__vel = velocity
 
+        # Best position so far
+        self.__best = position
+
+        # Best position known to informants so far
+        self.__inf_best = position
+
+        # Informants used to update social knowledge
+        self.__informants = []
+
+    def add_informant(self, informant: 'particle') -> None:
+        self.__informants.append(informant)
 
 class swarm:
     def __init__(
