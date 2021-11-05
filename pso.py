@@ -44,6 +44,7 @@ class swarm:
         # coordinate list so particles are positioned uniformly to start
         coords = np.random.rand(space_dims * swarm_size)
 
+        # The swarm consists of uniformly distributed particles
         self.__swarm = []
         for i in range(swarm_size):
             # Map initial uniform [0,1) position to dimension bounds
@@ -61,5 +62,19 @@ class swarm:
                 velocity,
             ))
 
-    def search():
+        # Every particle has a set of informants that influence search
+        for p in self.__swarm:
+            # This is a shallow copy so the reference elements persist
+            swarm_copy = self.__swarm.copy()
+
+            # Don't want to inform self
+            swarm_copy.remove(p)
+
+            # Shuffles the list in place
+            np.random.shuffle(swarm_copy)
+
+            for i in range(num_informants):
+                p.add_informant(swarm_copy[i])
+
+    def search(self):
         pass
