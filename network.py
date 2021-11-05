@@ -246,7 +246,7 @@ class network:
                         else:
                             repetition+=1
                     else:
-                        repetition = 1 
+                        repetition = 0 
 
         return (
             np.array(accuracy), np.array(loss),
