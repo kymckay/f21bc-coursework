@@ -225,22 +225,24 @@ class network:
         else:
             # Target accuracy is evaluated against the test dataset
             if (test_x is not None) and (test_y is not None):
-                converged = False
                 current_accuracy = 0
                 repetition = 0
+                # ANN initialization is counted as an epoch
+                epochs_count = 1
 
-                while converged == False:
+                while True:
                     self.backward_propagate(pred_y, train_y)
                     pred_y = self.forward_propagate(train_x, remember=True)
+                    epochs_count+=1
 
                     test_prob = self.forward_propagate(test_x)
                     test_pred = np.around(test_prob)
                     current_accuracy = np.mean(test_pred == test_y)
 
                     if (current_accuracy >= target_accuracy):
-                        # Target accuracy or above is maintained for 10 epochs
+                        # Target accuracy or above is maintained for 10 epochs, current epoch not included in the repetition count 
                         if (repetition == 9):
-                            converged = True
+                            return epochs_count
                         else:
                             repetition+=1
                     else:
