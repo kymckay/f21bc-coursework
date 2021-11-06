@@ -48,13 +48,18 @@ class layer:
 class network:
     # Produces a new network from a list representation of properties
     # Currently fixed architecture of 2 layers of 4 nodes
-    # List length must be n_nodes * (n_features + n_nodes * (n_layers - 1) + 1) + n_layers
+    # List length must be all of:
+    #   n_nodes * n_features            (input layer weights)
+    #   n_nodes ^ 2 * (n_layers - 1)    (hidden layer weights)
+    #   n_nodes                         (output layer weights)
+    #   n_layers                        (activation functions)
+    #   n_layers * n_nodes + 1          (all bias weights)
     @staticmethod
     def from_list(
         list_data: np.array,
         n_features: int
     ) -> 'network':
-        if len(list_data) != 4 * (n_features + 4 + 1) + 2:
+        if len(list_data) != n_features * 4 + 31:
             raise ValueError('ANN list representation of wrong length')
 
         layers = []
@@ -83,20 +88,23 @@ class network:
             )
 
             # Layer weights stored sequentially at front of list
-            # Remember these are unravelled so n_features * n_nodes
-            w_end = li * 4 ** 2 + n_features * 4
+            # Initial layer has (features * nodes) + nodes weights
+            # Subsequent have (nodes * nodes) + nodes weights
+            w_end = (n_features * 4 + 4) + li * (4 ** 2 + 4)
 
-            layer_i.w = list_data[w_start:w_end].reshape((4, n_inputs))
-
+            layer_i.w = list_data[w_start:w_end].reshape(
+                # +1 for bias weights
+                (4, n_inputs + 1)
+            )
             layers.append(layer_i)
 
             # Next layer weights start from end of current
             w_start = w_end
 
         # Output layer
-        layers.append(
-            layer(4, 1, funcs.sigmoid)
-        )
+        layer_out = layer(4, 1, funcs.sigmoid)
+        layer_out.w = list_data[-2-4-1:-2].reshape((1, 5))
+        layers.append(layer_out)
 
         return network(layers)
 
