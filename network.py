@@ -70,7 +70,7 @@ class network:
 
             # Activation functions stored in reverse sequence at the
             # end of the list
-            af_i = list_data[-li]
+            af_i = list_data[-li-1]
 
             # Truncate index so ranges 0-1, 1-2, 2-3, 3-4 correspond to
             # the various activation functions
