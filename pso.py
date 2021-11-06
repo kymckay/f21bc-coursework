@@ -1,6 +1,22 @@
+from typing import Iterable
 import network
 import dataset
 import numpy as np
+
+def _get_best_pos(particles: Iterable):
+    # Accuracy can't be negative so
+    # valid initial value for search
+    best_fit = -1
+
+    for p in particles:
+        p_best, p_fit = p.get_best()
+
+        # Fitness always maximised
+        if p_fit > best_fit:
+            best_fit = p_fit
+            best_pos = p_best
+
+    return best_pos
 
 class particle:
     def __init__(
@@ -25,8 +41,8 @@ class particle:
         net = network.network.from_list(self.__pos, dataset.num_features)
         y_pred = net.forward_propagate(dataset.x)
 
-        # Loss is best minimised so negate for fitness
-        return -net.get_loss(dataset.y, y_pred)
+        # Want to maximise accuracy
+        return np.mean(np.around(y_pred) == dataset.y)
 
     def add_informant(self, informant: 'particle') -> None:
         self.__informants.append(informant)
@@ -41,13 +57,7 @@ class particle:
     # For efficiency, can only update informant best after all particles
     # update their own best (avoids repeatedly finding their fitness)
     def update_informed_best(self):
-        best_fit = -np.inf
-
-        for p in self.__informants:
-            p_best, p_fit = p.get_best()
-            if p_fit > best_fit:
-                best_fit = p_fit
-                self.__inf_best = p_best
+        self.__inf_best = _get_best_pos(self.__informants)
 
     def get_best(self) -> np.array:
         return self.__best, self.__best_fit
@@ -154,11 +164,4 @@ class swarm:
 
 
         # Return the best fitness particle position
-        best_fit = -np.inf
-        for p in self.__swarm:
-            p_best, p_fit = p.get_best()
-            if p_fit > best_fit:
-                best_fit = p_fit
-                best_pos = p_best
-
-        return best_pos
+        return _get_best_pos(self.__swarm)
