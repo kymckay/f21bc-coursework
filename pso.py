@@ -13,6 +13,7 @@ class particle:
 
         # Best position so far
         self.__best = position
+        self.__best_fit = self.fitness()
 
         # Best position known to informants so far
         self.__inf_best = position
