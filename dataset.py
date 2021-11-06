@@ -17,3 +17,5 @@ y_test = y[:split_index]
 
 x = x[split_index:]
 y = y[split_index:]
+
+num_instances, num_features = x.shape

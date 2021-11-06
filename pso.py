@@ -21,7 +21,7 @@ class particle:
         self.__informants = []
 
     def fitness(self):
-        net = network.network.from_list(self.__pos)
+        net = network.network.from_list(self.__pos, dataset.num_features)
         y_pred = net.forward_propagate(dataset.x)
 
         # Loss is best minimised so negate for fitness
