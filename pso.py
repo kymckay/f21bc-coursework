@@ -133,7 +133,7 @@ class swarm:
         alpha: float = 1, # Inertia weight
         beta: float = 1, # Cognative weight
         gamma: float = 1, # Social weight
-        epsilon: float = 0.5, # Step size
+        epsilon: float = 1, # Step size
     ) -> np.array:
         converged = False
         temp = 0
@@ -150,7 +150,7 @@ class swarm:
                 p.move(epsilon, self.__min_bounds, self.__max_bounds)
 
             temp += 1
-            converged = temp == 1500
+            converged = temp == 50
 
 
         # Return the best fitness particle position
