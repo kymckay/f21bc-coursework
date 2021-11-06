@@ -13,7 +13,6 @@ class particle:
 
         # Best position so far
         self.__best = position
-        self.__best_fit = self.fitness()
 
         # Best position known to informants so far
         self.__inf_best = position
@@ -134,14 +133,31 @@ class swarm:
         beta: float = 1, # Cognative weight
         gamma: float = 1, # Social weight
         epsilon: float = 0.5, # Step size
-    ) -> None:
-        # Though this may look like additional looping, it is more
-        # efficient since updating all the bests first means the fitness
-        # values are cached for the informat information sharing step
-        for p in self.__swarm:
-            p.update_best()
+    ) -> np.array:
+        converged = False
+        temp = 0
+        while not converged:
+            # Though this may look like additional looping, it is more
+            # efficient since updating all the bests first means the fitness
+            # values are cached for the informant information sharing step
+            for p in self.__swarm:
+                p.update_best()
 
+            for p in self.__swarm:
+                p.update_informed_best()
+                p.steer(alpha, beta, gamma)
+                p.move(epsilon, self.__min_bounds, self.__max_bounds)
+
+            temp += 1
+            converged = temp == 1500
+
+
+        # Return the best fitness particle position
+        best_fit = -np.inf
         for p in self.__swarm:
-            p.update_informed_best()
-            p.steer(alpha, beta, gamma)
-            p.move(epsilon, self.__min_bounds, self.__max_bounds)
+            p_best, p_fit = p.get_best()
+            if p_fit > best_fit:
+                best_fit = p_fit
+                best_pos = p_best
+
+        return best_pos
