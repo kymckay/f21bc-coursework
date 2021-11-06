@@ -53,7 +53,7 @@ class network:
     def from_list(
         list_data: np.array,
         n_features: int
-    ):
+    ) -> 'network':
         if len(list_data) != 4 * (n_features + 4 + 1) + 2:
             raise ValueError('ANN list representation of wrong length')
 
@@ -74,7 +74,7 @@ class network:
                 funcs.tanh,
                 funcs.relu,
                 funcs.leaky_relu
-            ][af_i // 1]
+            ][int(af_i)]
 
             layer_i = layer(
                 n_inputs,
@@ -223,7 +223,8 @@ class network:
                     accuracy_test.append(np.mean(test_pred == test_y))
                     loss_test.append(self.get_loss(test_y, test_prob))
 
-        # If epochs set to None, network is trained to specified accuracy target (0.95 by default) is achieved
+        # If epochs set to None, network is trained to specified
+        # accuracy target (0.95 by default) is achieved
         else:
             # Target accuracy is evaluated against the test dataset
             if (test_x is not None) and (test_y is not None):
@@ -242,13 +243,13 @@ class network:
                     current_accuracy = np.mean(test_pred == test_y)
 
                     if (current_accuracy >= target_accuracy):
-                        # Target accuracy or above is maintained for 10 epochs, current epoch not included in the repetition count 
+                        # Target accuracy or above is maintained for 10 epochs, current epoch not included in the repetition count
                         if (repetition == 9):
                             return epochs_count
                         else:
                             repetition+=1
                     else:
-                        repetition = 0 
+                        repetition = 0
 
         return (
             np.array(accuracy), np.array(loss),
