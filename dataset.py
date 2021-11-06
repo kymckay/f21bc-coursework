@@ -5,7 +5,7 @@ data = pd.read_csv("data_banknote_authentication.txt",
     sep=",",
     header=None,
 )
-x = data.iloc[:, 0:3].to_numpy()
+x = data.iloc[:, 0:4].to_numpy()
 y = data.iloc[:, 4].to_numpy()
 
 # Test data set to check for overfitting (20% of overall set)
