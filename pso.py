@@ -185,3 +185,18 @@ class swarm:
 
         # Return the best fitness particle position
         return _get_best_pos(self.__swarm)
+
+    # Returns positions of all particles throughout the search
+    def track_search(self, iterations) -> list[list[np.ndarray]]:
+        iteration = 0
+        positions = [[]] * len(self.__swarm)
+
+        while iteration < iterations:
+            self._search_step()
+            iteration += 1
+
+            for i, p in enumerate(self.__swarm):
+                positions[i].append(p._particle__pos)
+
+        # Return the best fitness particle position
+        return positions
