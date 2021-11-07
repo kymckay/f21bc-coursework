@@ -177,26 +177,22 @@ class swarm:
             p.move(self.__epsilon, self.__min_bounds, self.__max_bounds)
 
     def search(self, iterations) -> np.ndarray:
-        iteration = 0
-
-        while iteration < iterations:
+        for _ in range(iterations):
             self._search_step()
-            iteration += 1
 
         # Return the best fitness particle position
         return _get_best_pos(self.__swarm)
 
     # Returns positions of all particles throughout the search
     def track_search(self, iterations) -> list[list[np.ndarray]]:
-        iteration = 0
-        positions = [[]] * len(self.__swarm)
+        positions = [[] for _ in self.__swarm]
 
-        while iteration < iterations:
+        for _ in range(iterations):
             self._search_step()
-            iteration += 1
 
             for i, p in enumerate(self.__swarm):
                 positions[i].append(p._particle__pos)
 
-        # Return the best fitness particle position
-        return positions
+        # Return the particle positions stacked (so index 0 tracks one
+        # variable through the iterations)
+        return [ np.stack(data, axis=1) for data in positions ]
