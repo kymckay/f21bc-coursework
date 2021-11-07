@@ -21,8 +21,8 @@ def _get_best_pos(particles: Iterable):
 class particle:
     def __init__(
         self,
-        position: np.array,
-        velocity: np.array,
+        position: np.ndarray,
+        velocity: np.ndarray,
     ) -> None:
         self.__pos = position
         self.__vel = velocity
@@ -59,7 +59,7 @@ class particle:
     def update_informed_best(self):
         self.__inf_best = _get_best_pos(self.__informants)
 
-    def get_best(self) -> np.array:
+    def get_best(self) -> np.ndarray:
         return self.__best, self.__best_fit
 
     def move(self, epsilon, min_bounds, max_bounds):
@@ -88,8 +88,8 @@ class swarm:
     def __init__(
         self,
         # Specifies the desired bounds of the search space
-        min_values: np.array,
-        max_values: np.array,
+        min_values: np.ndarray,
+        max_values: np.ndarray,
         swarm_size: int = 10,
         num_informants: int = 3,
     ) -> None:
@@ -168,7 +168,7 @@ class swarm:
             p.steer(self.__alpha, self.__beta, self.__gamma)
             p.move(self.__epsilon, self.__min_bounds, self.__max_bounds)
 
-    def search(self, iterations) -> np.array:
+    def search(self, iterations) -> np.ndarray:
         iteration = 0
 
         while iteration < iterations:
