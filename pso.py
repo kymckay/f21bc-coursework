@@ -65,8 +65,16 @@ class particle:
     def move(self, epsilon, min_bounds, max_bounds):
         new_pos = self.__pos + epsilon * self.__vel
 
-        # TODO: Other methods of handling bounds
-        new_pos = np.minimum(np.maximum(new_pos, min_bounds), max_bounds)
+        # Boolean vector of dimensions that are out of bounds
+        oob_min = min_bounds > new_pos
+        oob_max = new_pos < max_bounds
+
+        # Deny position updates that lead out of bounds
+        new_pos[oob_min] = self.__pos[oob_min]
+        new_pos[oob_max] = self.__pos[oob_max]
+
+        # Modify velocity to actual change to redirect from boundary
+        self.__vel = (new_pos - self.__pos) / epsilon
 
         self.__pos = new_pos
 
