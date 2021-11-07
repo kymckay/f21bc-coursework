@@ -100,6 +100,12 @@ class swarm:
         self.__min_bounds = min_values
         self.__max_bounds = max_values
 
+        # Just some initial values, set via public method
+        self.__alpha = 1
+        self.__beta = 1
+        self.__gamma = 1
+        self.__epsilon = 1
+
         space_dims = len(min_values)
 
         # np.random.rand has uniform distribution, distribute one big
@@ -138,30 +144,36 @@ class swarm:
             for i in range(num_informants):
                 p.add_informant(swarm_copy[i])
 
-    def search(
-        self,
-        alpha: float = 1, # Inertia weight
-        beta: float = 1, # Cognative weight
-        gamma: float = 1, # Social weight
-        epsilon: float = 1, # Step size
-    ) -> np.array:
-        converged = False
-        temp = 0
-        while not converged:
-            # Though this may look like additional looping, it is more
-            # efficient since updating all the bests first means the fitness
-            # values are cached for the informant information sharing step
-            for p in self.__swarm:
-                p.update_best()
+    def set_hyperparameters(self,
+        alpha: float = None, # Inertia weight
+        beta: float = None, # Cognative weight
+        gamma: float = None, # Social weight
+        epsilon: float = None, # Step size
+    ) -> None:
+        # Only update hyperparameters if asked
+        self.__alpha = alpha if alpha is not None else self.__alpha
+        self.__beta = beta if beta is not None else self.__beta
+        self.__gamma = gamma if gamma is not None else self.__gamma
+        self.__epsilon = epsilon if epsilon is not None else self.__epsilon
 
-            for p in self.__swarm:
-                p.update_informed_best()
-                p.steer(alpha, beta, gamma)
-                p.move(epsilon, self.__min_bounds, self.__max_bounds)
+    def _search_step(self) -> None:
+        # Though this may look like additional looping, it is more
+        # efficient since updating all the bests first means the fitness
+        # values are cached for the informant information sharing step
+        for p in self.__swarm:
+            p.update_best()
 
-            temp += 1
-            converged = temp == 50
+        for p in self.__swarm:
+            p.update_informed_best()
+            p.steer(self.__alpha, self.__beta, self.__gamma)
+            p.move(self.__epsilon, self.__min_bounds, self.__max_bounds)
 
+    def search(self, iterations) -> np.array:
+        iteration = 0
+
+        while iteration < iterations:
+            self._search_step()
+            iteration += 1
 
         # Return the best fitness particle position
         return _get_best_pos(self.__swarm)
