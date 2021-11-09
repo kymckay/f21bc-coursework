@@ -2,17 +2,16 @@ from typing import Iterable
 import network
 import dataset
 import numpy as np
+from math import inf
 
 def _get_best_pos(particles: Iterable):
-    # Accuracy can't be negative so
-    # valid initial value for search
-    best_fit = -1
+    best_fit = inf
 
     for p in particles:
         p_best, p_fit = p.get_best()
 
-        # Fitness always maximised
-        if p_fit > best_fit:
+        # Loss is minimised
+        if p_fit < best_fit:
             best_fit = p_fit
             best_pos = p_best
 
@@ -41,8 +40,10 @@ class particle:
         net = network.network.from_list(self.__pos, dataset.num_features)
         y_pred = net.forward_propagate(dataset.x)
 
-        # Want to maximise accuracy
-        return np.mean(np.around(y_pred) == dataset.y)
+        # Using loss for fitness since accuracy involved rounding which
+        # means improvement will be limited to just getting probabilities
+        # on the right side of 0.5
+        return net.get_loss(dataset.y, y_pred)
 
     def add_informant(self, informant: 'particle') -> None:
         self.__informants.append(informant)
@@ -50,7 +51,8 @@ class particle:
     def update_best(self):
         fitness = self.fitness()
 
-        if fitness > self.__best_fit:
+        # Loss is minimised
+        if fitness < self.__best_fit:
             self.__best = self.__pos
             self.__best_fit = fitness
 
