@@ -66,15 +66,13 @@ class particle:
         new_pos = self.__pos + epsilon * self.__vel
 
         # Boolean vector of dimensions that are out of bounds
-        oob_min = min_bounds > new_pos
-        oob_max = new_pos < max_bounds
+        oob = np.logical_and(min_bounds > new_pos, new_pos < max_bounds)
 
-        # Deny position updates that lead out of bounds
-        new_pos[oob_min] = self.__pos[oob_min]
-        new_pos[oob_max] = self.__pos[oob_max]
+        # Absorb boundary enforcement, any OOB dimensions get velocity 0
+        self.__vel[oob] = 0
 
-        # Modify velocity to actual change to redirect from boundary
-        self.__vel = (new_pos - self.__pos) / epsilon
+        # Absorb boundary enforcement, any OOB coords are bound to limits
+        new_pos = np.minimum(np.maximum(min_bounds, new_pos), max_bounds)
 
         self.__pos = new_pos
 
