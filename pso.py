@@ -1,11 +1,14 @@
+import math
 from typing import Iterable
-import network
-import dataset
+
 import numpy as np
-from math import inf
+
+import dataset
+import network
+
 
 def _get_best_pos(particles: Iterable):
-    best_fit = inf
+    best_fit = math.inf
 
     for p in particles:
         p_best, p_fit = p.get_best()
@@ -34,7 +37,7 @@ class particle:
         self.__inf_best = position
 
         # Informants used to update social knowledge
-        self.__informants = []
+        self.__informants = set()
 
     def fitness(self):
         net = network.network.from_list(self.__pos, dataset.num_features)
@@ -46,7 +49,11 @@ class particle:
         return net.get_loss(dataset.y, y_pred)
 
     def add_informant(self, informant: 'particle') -> None:
-        self.__informants.append(informant)
+        # Already own informant
+        if informant == self:
+            return
+
+        self.__informants.add(informant)
 
     def update_best(self):
         fitness = self.fitness()
@@ -139,18 +146,15 @@ class swarm:
             ))
 
         # Every particle has a set of informants that influence search
-        for p in self.__swarm:
-            # This is a shallow copy so the reference elements persist
-            swarm_copy = self.__swarm.copy()
+        # Using the ring topology for good sharing of knowledge throughout swarm
+        for i, p in enumerate(self.__swarm):
+            # Ceil and floor accounts for odd numbers (+1 to right)
+            to_left = math.floor(num_informants / 2)
+            to_right = math.ceil(num_informants / 2)
 
-            # Don't want to inform self
-            swarm_copy.remove(p)
-
-            # Shuffles the list in place
-            np.random.shuffle(swarm_copy)
-
-            for i in range(num_informants):
-                p.add_informant(swarm_copy[i])
+            for j in range(-to_left, to_right + 1):
+                index = (i + j) % swarm_size
+                p.add_informant(self.__swarm[index])
 
     def set_hyperparameters(self,
         alpha: float = None, # Inertia weight
