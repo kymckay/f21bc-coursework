@@ -1,0 +1,86 @@
+\documentclass[12pt]{article}
+\usepackage[margin=2cm]{geometry}
+
+% for links
+\usepackage{hyperref}
+
+% to include images
+\usepackage{graphicx}
+
+% for equation environments
+\usepackage{amsmath}
+
+% For header and footer
+\usepackage{fancyhdr}
+\usepackage{float} % formats figures
+\pagestyle{fancy}
+\fancyhf{} % clears default style
+\lhead{F21BC Biologically Inspired Computation}
+\lfoot{Kyle Mckay (km2008), Lina Rietuma (lr2004)}
+\cfoot{\thepage}
+\rfoot{HWU Person IDs: H00358352, H00361943}
+\renewcommand{\headrulewidth}{0pt}
+
+% No paragraph indentation
+\setlength\parindent{0pt}
+\setlength\parskip{1em}
+\raggedright
+
+\begin{document}
+
+\title{Multi-layer Artificial Neural Network}
+
+\begin{center}
+  \Large{Particle Swarm Optimization-trained Artificial Neural Network Implementation}
+\end{center}
+
+\vspace{-2em}
+\section{Introduction}
+%\vspace{-1.5em}
+
+
+\vspace{-1.5em}
+\section{Program development rationale}
+%\vspace{-1.5em}
+
+
+\vspace{-1.5em}
+\section{Methods}
+%\vspace{-1.5em}
+
+
+Swarm size – Landscape of the problem space will influence the optimal swarm size, larger swarms are more effective at finding global minima in complex landscapes but come with additional computational complexity. Overall, the optimal swarm size is problem-dependent, heavily influenced by the dimensionality of the problem \cite{Razee}. Suggested formula for determining swarm size: S = 10 + 2sqrt(D) where D is the problem dimensions (can refer to Fig. 3.1. from the same reference)\cite{Clerc}.
+
+Neighbourhood size – e.g. the number of informants, inherent to ring topology each particle has 2 informants, justification for ring topology – simple and effective \cite{Clerc}. 
+
+Alpha (a, i.e. inertia weight)– proportion of the original velocity to be retained, accepted values in literature min=0.4, max=0.9 \cite{Razee}.
+
+Epsilon – particles' step size, most commonly set to 1 \cite{Luke}.
+
+
+\vspace{-1.5em}
+\section{Results}
+%\vspace{-1.5em}
+
+
+
+\vspace{-1.5em}
+\section{Discussion and Conclusions}
+\vspace{-1.5em}
+
+A relatively large Beta with respect to Gamma can result in excessive wandering within the problem space while the reverse  can lead to the swarm prematurely settling on a local minimum. Approximately equal values of Beta and Delta yield the most effective search of the problem space \cite{Kennedy}.
+
+Evidence of PSO being as efficient if not better at finding optimum weights than backpropagation, PSO trained ANNs generalize better to unseen data \cite{Kennedy}.
+
+
+\vspace{-1.5em}
+\begin{thebibliography}{10}
+\bibitem{Luke} Sean Luke, 2013, ``Essentials of Metaheuristics", Lulu, second edition, available at http://cs.gmu.edu/∼sean/book/metaheuristics/
+\bibitem{Kennedy} J. Kennedy, R. Eberhart, 1995, ``Particle swarm optimization," Proceedings of ICNN'95 - International Conference on Neural Networks,  pp. 1942-1948 vol.4, doi: 10.1109/ICNN.1995.488968.
+\bibitem{Razee} A. Rezaee Jordehi, J. Jasni, 2013, ``Parameter selection in particle swarm optimisation: a survey, Journal of Experimental & Theoretical Artificial Intelligence", 25:4, 527-542, DOI: 10.1080/0952813X.2013.782348
+\bibitem{Clerc} Maurice Clerc, 2012, ``Standard Particle Swarm Optimisation", hal-00764996
+
+
+\end{thebibliography}
+
+\end{document}
