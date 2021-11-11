@@ -48,12 +48,20 @@ class layer:
 class network:
     # Produces a new network from a list representation of properties
     # Currently fixed architecture of 2 layers of 4 nodes
-    # List length must be n_nodes * (n_features + n_nodes * (n_layers - 1) + 1) + n_layers
+    # List length must be all of:
+    #   n_nodes * n_features            (input layer weights)
+    #   n_nodes ^ 2 * (n_layers - 1)    (hidden layer weights)
+    #   n_nodes                         (output layer weights)
+    #   n_layers                        (activation functions)
+    #   n_layers * n_nodes + 1          (all bias weights)
     @staticmethod
     def from_list(
-        list_data: Iterable[float],
+        list_data: np.array,
         n_features: int
-    ):
+    ) -> 'network':
+        if len(list_data) != n_features * 4 + 31:
+            raise ValueError('ANN list representation of wrong length')
+
         layers = []
 
         w_start = 0
@@ -62,7 +70,7 @@ class network:
 
             # Activation functions stored in reverse sequence at the
             # end of the list
-            af_i = list_data[-li]
+            af_i = list_data[-li-1]
 
             # Truncate index so ranges 0-1, 1-2, 2-3, 3-4 correspond to
             # the various activation functions
@@ -71,7 +79,7 @@ class network:
                 funcs.tanh,
                 funcs.relu,
                 funcs.leaky_relu
-            ][af_i // 1]
+            ][int(af_i)]
 
             layer_i = layer(
                 n_inputs,
@@ -80,21 +88,23 @@ class network:
             )
 
             # Layer weights stored sequentially at front of list
-            # Remember these are unravelled so n_features * n_nodes
-            w_end = li * 4 ** 2 + n_features * 4
+            # Initial layer has (features * nodes) + nodes weights
+            # Subsequent have (nodes * nodes) + nodes weights
+            w_end = (n_features * 4 + 4) + li * (4 ** 2 + 4)
 
-            layer_i.w = np.array(
-                list_data[w_start:w_end]).reshape( (4, n_inputs) )
-
+            layer_i.w = list_data[w_start:w_end].reshape(
+                # +1 for bias weights
+                (4, n_inputs + 1)
+            )
             layers.append(layer_i)
 
             # Next layer weights start from end of current
             w_start = w_end
 
         # Output layer
-        layers.append(
-            layer(4, 1, funcs.sigmoid)
-        )
+        layer_out = layer(4, 1, funcs.sigmoid)
+        layer_out.w = list_data[-2-4-1:-2].reshape((1, 5))
+        layers.append(layer_out)
 
         return network(layers)
 
@@ -221,7 +231,8 @@ class network:
                     accuracy_test.append(np.mean(test_pred == test_y))
                     loss_test.append(self.get_loss(test_y, test_prob))
 
-        # If epochs set to None, network is trained to specified accuracy target (0.95 by default) is achieved
+        # If epochs set to None, network is trained to specified
+        # accuracy target (0.95 by default) is achieved
         else:
             # Target accuracy is evaluated against the test dataset
             if (test_x is not None) and (test_y is not None):
@@ -240,13 +251,13 @@ class network:
                     current_accuracy = np.mean(test_pred == test_y)
 
                     if (current_accuracy >= target_accuracy):
-                        # Target accuracy or above is maintained for 10 epochs, current epoch not included in the repetition count 
+                        # Target accuracy or above is maintained for 10 epochs, current epoch not included in the repetition count
                         if (repetition == 9):
                             return epochs_count
                         else:
                             repetition+=1
                     else:
-                        repetition = 0 
+                        repetition = 0
 
         return (
             np.array(accuracy), np.array(loss),
