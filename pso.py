@@ -1,11 +1,12 @@
 import math
-from typing import Iterable
+from typing import Callable, Iterable
 
 import numpy as np
 
-import dataset
-import network
-
+# Default simple fitness function that works for n dimensions
+# Has global minimum at origin point
+def _sphere(coords: np.ndarray):
+    return np.sum(coords ** 2)
 
 def _get_best_pos(particles: Iterable):
     best_fit = math.inf
@@ -13,7 +14,7 @@ def _get_best_pos(particles: Iterable):
     for p in particles:
         p_best, p_fit = p.get_best()
 
-        # Loss is minimised
+        # Fitness is minimised
         if p_fit < best_fit:
             best_fit = p_fit
             best_pos = p_best
@@ -25,28 +26,21 @@ class particle:
         self,
         position: np.ndarray,
         velocity: np.ndarray,
+        fitness: Callable = _sphere,
     ) -> None:
         self.__pos = position
         self.__vel = velocity
+        self.__fit = fitness
 
         # Best position so far
         self.__best = position
-        self.__best_fit = self.fitness()
+        self.__best_fit = fitness(position)
 
         # Best position known to informants so far
         self.__inf_best = position
 
         # Informants used to update social knowledge
         self.__informants = set()
-
-    def fitness(self):
-        net = network.network.from_list(self.__pos, dataset.num_features)
-        y_pred = net.forward_propagate(dataset.x)
-
-        # Using loss for fitness since accuracy involved rounding which
-        # means improvement will be limited to just getting probabilities
-        # on the right side of 0.5
-        return net.get_loss(dataset.y, y_pred)
 
     def add_informant(self, informant: 'particle') -> None:
         # Already own informant
@@ -56,9 +50,9 @@ class particle:
         self.__informants.add(informant)
 
     def update_best(self):
-        fitness = self.fitness()
+        fitness = self.__fit(self.__pos)
 
-        # Loss is minimised
+        # Fitness is minimised
         if fitness < self.__best_fit:
             self.__best = self.__pos
             self.__best_fit = fitness
@@ -107,6 +101,7 @@ class swarm:
         max_values: np.ndarray,
         swarm_size: int = 10,
         num_informants: int = 3,
+        fitness_func: Callable = _sphere,
     ) -> None:
         # Sanity check
         if len(min_values) != len(max_values):
@@ -143,6 +138,7 @@ class swarm:
             self.__swarm.append(particle(
                 position,
                 velocity,
+                fitness_func
             ))
 
         # Every particle has a set of informants that influence search
