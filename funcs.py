@@ -8,6 +8,9 @@ class dfunc:
 
 # Can use Sigmoid function to compress to 0-1 range as probability
 def _sigmoid(z):
+    # Prevents overflow issues in NumPY
+    z = np.clip(z, -500, 500)
+
     return 1 / (1 + np.exp(-z))
 
 def _d_sigmoid(z):
@@ -15,6 +18,9 @@ def _d_sigmoid(z):
 
 # output value between 1 and -1 therefore can't be used in the output layer (use sofmax func (e.g., sigmoid) instead)
 def _tanh(z):
+    # Prevents overflow issues in NumPY
+    z = np.clip(z, -500, 500)
+
     return (np.exp(z) - np.exp(-z)) / (np.exp(z) + np.exp(-z))
 
 def _d_tanh(z):
