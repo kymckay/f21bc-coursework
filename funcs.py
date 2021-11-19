@@ -42,6 +42,10 @@ def _d_leaky_relu(z):
     return vectorised_func(z)
 
 def _log_loss(y, y_hat):
+    # Prevent divide by 0 in log (if predicting exactly 0/1)
+    # NumPY uses doubles which store ~14 decimal places
+    y_hat = np.clip(y_hat, 1e-14, 1 - 1e-14)
+
     # Remember these operations are element-wise
     a = y * np.log(y_hat)
     b = 1 - y
@@ -49,6 +53,10 @@ def _log_loss(y, y_hat):
     return -(a + b * c)
 
 def _d_log_loss(y, y_hat):
+    # Prevent 0 divisor (if predicting exactly 0/1)
+    # NumPY uses doubles which store ~14 decimal places
+    y_hat = np.clip(y_hat, 1e-14, 1 - 1e-14)
+
     # Remember these operations are element-wise
     return (y_hat - y) / (y_hat - y_hat**2)
 
