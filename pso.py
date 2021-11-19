@@ -131,9 +131,13 @@ class swarm:
                 * (max_values - min_values) + min_values
             )
 
-            # Initial velocity is just random
-            # TODO: may need to find suitable initial values for this
-            velocity = np.random.rand(space_dims)
+            # Initial velocity is random following SPSO 2011
+            # Uniform in range (min - pos, max - pos) for each dimension
+            velocity = (
+                np.random.rand(space_dims)
+                * (max_values - min_values)
+                + (min_values - position)
+            )
 
             self.__swarm.append(particle(
                 position,
