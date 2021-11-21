@@ -28,10 +28,10 @@
 
 \begin{document}
 
-\title{Particle Swarm Optimization-trained Artificial Neural Network Implementation}
+\title{Particle Swarm Optimisation-trained Artificial Neural Network Implementation}
 
 \begin{center}
-  \Large{Particle Swarm Optimization-trained Artificial Neural Network Implementation}
+  \Large{Particle Swarm Optimisation-trained Artificial Neural Network Implementation}
 \end{center}
 
 \vspace{-2em}
@@ -44,7 +44,7 @@
 %\vspace{-1.5em}
 
 Following on from the ANN implementation, PSO was also implemented in
-Python using NumPY for efficicnet updates to all position and velocity
+Python using NumPY for efficient updates to all position and velocity
 dimensional components at once.
 
 The implementation consists of a \texttt{particle} class which houses the
@@ -54,16 +54,23 @@ class is used to instantiate a new PSO swarm with a defined set of search space
 dimensions; modify the PSO hyperparameters; and ultimately initiate a search.
 
 For quality of life, the fitness function used by the search is a parameter
-and not hardcoded into the swarm class. This means the PSO code is not coupled
-to a specific search problem and is more generally usable.
+and not hard-coded into the swarm class. This means the PSO code is not coupled
+to a specific search problem and is more generally usable. By default,
+the sphere function is used for fitness since it works in \(n\) dimensions
+and is a simple test case.
 
-The swarm particles are initalized uniformly throughout the search space
+The swarm particles are initialised uniformly throughout the search space
 by distributing a shared uniform vector of values and their initial velocities
 are set in accordance with SPSO 2011. \cite{Clerc}
 
 During the search, the "absorbing" \cite{Chu} boundary enforcement scheme is used
 for simplicity. Other schemes were tried (random, reflecting) and found to have
 little effect.
+
+For use in investigation, a static \texttt{from\_list} method is added to
+the \texttt{network} class that converts an appropriate length \texttt{numpy.ndarray}
+into a \texttt{network} instance. In this way, a particle's current position
+represents an ANN that can be used with the dataset to produce a fitness value (loss, accuracy, etc.)
 
 \vspace{-1.5em}
 \section{Methods}
@@ -95,7 +102,7 @@ Epsilon – particles' step size, most commonly set to 1 \cite{Luke}.
 
 A relatively large Beta with respect to Gamma can result in excessive wandering within the problem space while the reverse  can lead to the swarm prematurely settling on a local minimum. Approximately equal values of Beta and Delta yield the most effective search of the problem space \cite{Kennedy}.
 
-Evidence of PSO being as efficient if not better at finding optimum weights than backpropagation, PSO trained ANNs generalize better to unseen data \cite{Kennedy}.
+Evidence of PSO being as efficient if not better at finding optimum weights than backpropagation, PSO trained ANNs generalise better to unseen data \cite{Kennedy}.
 
 
 \vspace{-1.5em}
