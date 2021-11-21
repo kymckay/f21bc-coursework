@@ -49,7 +49,7 @@
 %\vspace{-1.5em}
 
 
-Swarm size – Landscape of the problem space will influence the optimal swarm size, larger swarms are more effective at finding global minima in complex landscapes but come with additional computational complexity. Overall, the optimal swarm size is problem-dependent, heavily influenced by the dimensionality of the problem \cite{Razee}. Suggested formula for determining swarm size: S = 10 + 2sqrt(D) where D is the problem dimensions (can refer to Fig. 3.1. from the same reference)\cite{Clerc}.
+Swarm size – Landscape of the problem space will influence the optimal swarm size, larger swarms are more effective at finding global minima in complex landscapes but come with additional computational complexity. Overall, the optimal swarm size is problem-dependent, heavily influenced by the dimensionality of the problem \cite{Razee}. Suggested formula for determining swarm size: S = 10 + 2sqrt(D) (for this ANN architecture and input size it implies a swarm size of 24)where D is the problem dimensions (can refer to Fig. 3.1. from the same reference)\cite{Clerc}.
 
 Neighbourhood size – e.g. the number of informants, inherent to ring topology each particle has 2 informants, justification for ring topology – simple and effective \cite{Clerc}. 
 
@@ -67,10 +67,53 @@ Epsilon – particles' step size, most commonly set to 1 \cite{Luke}.
 %\vspace{-1.5em}
 
 
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.9\textwidth]{figs/combo_ttime.png}
+  \caption{
+    Average training time of each model across 10 iterations.
+    Modified hyperparameter abbreviation identifies each model:
+    L = hidden layers, N = nodes, S|T|R|LR = activation function,
+    A = learning rate for back-propagation models, SS = swarm size, () = search range, IW = inertia weight, E = epsilon for PSO models.
+  }
+  \label{fig:ttime}
+\end{figure}
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.9\textwidth]{figs/combo_acc.png}
+  \caption{
+    Average accuracy of each model across 10 iterations.
+    Modified hyperparameter abbreviation identifies each model:
+    L = hidden layers, N = nodes, S|T|R|LR = activation function,
+    A = learning rate for back-propagation models, SS = swarm size, () = search range, IW = inertia weight, E = epsilon for PSO models.
+  }
+  \label{fig:accuracy}
+\end{figure}
+
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.45\textwidth]{figs/beta_gamma.png}
+  \caption{
+    Average accuracy across 10 iterations for varied combinations of beta (cognitive component) and gamma (social component) values.
+  }
+  \label{fig:bg}
+\end{figure}
+
 
 \vspace{-1.5em}
 \section{Discussion and Conclusions}
 \vspace{-1.5em}
+
+
+
+
+It is evident from average accuracies (Figure 2 \ref{fig:accuracy} that a PSO-trained ANNs are heavily underperforming compared to back-propagation models. Similarly low accuracies regardless of PSO hyper-parameter combination used, suggest that PSO particles get stuck in a local optima. 
+
+To improve PSO's performance, alternative fitness metrics were tested. A switch from classification accuracy to using cross-entropy loss value was made to capture a more detailed change in ANN's performance as the particles move through the search space.  An observation that all input instances are classified as the dominant class (i.e., the class with more instances) motivated the switch to a fitness metric insensitive to class size  imbalances, i.e. Matthew's Correlation Coefficient (MCC). Using MCC prevents classifying all inputs as a single class, however the overall classifier accuracy decreases. 
+
+
 
 A relatively large Beta with respect to Gamma can result in excessive wandering within the problem space while the reverse  can lead to the swarm prematurely settling on a local minimum. Approximately equal values of Beta and Delta yield the most effective search of the problem space \cite{Kennedy}.
 
