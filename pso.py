@@ -81,7 +81,14 @@ class particle:
 
     # Importantly the velocity update apply a random coefficient to each
     # dimensional component for stochastic behaviour
-    def steer(self, alpha, beta, gamma):
+    def steer(
+        self,
+        alpha: float,
+        beta: float,
+        gamma: float,
+        delta: float,
+        g_best: np.ndarray
+    ):
         dims = len(self.__vel)
 
         self.__vel = (
@@ -91,6 +98,8 @@ class particle:
             beta * np.random.rand(dims) * (self.__best - self.__pos) +
             # Social component, want to explore near best group known area
             gamma * np.random.rand(dims) * (self.__inf_best - self.__pos)
+            # Global social component, want to explore near swarm best
+            + delta * np.random.rand(dims) * (g_best - self.__pos)
         )
 
 class swarm:
@@ -114,6 +123,7 @@ class swarm:
         self.__alpha = 1
         self.__beta = 1
         self.__gamma = 1
+        self.__delta = 1
         self.__epsilon = 1
 
         space_dims = len(min_values)
@@ -156,12 +166,14 @@ class swarm:
         alpha: float = None, # Inertia weight
         beta: float = None, # Cognative weight
         gamma: float = None, # Social weight
+        delta: float = None, # Swarm social weight
         epsilon: float = None, # Step size
     ) -> None:
         # Only update hyperparameters if asked
         self.__alpha = alpha if alpha is not None else self.__alpha
         self.__beta = beta if beta is not None else self.__beta
         self.__gamma = gamma if gamma is not None else self.__gamma
+        self.__delta = delta if delta is not None else self.__delta
         self.__epsilon = epsilon if epsilon is not None else self.__epsilon
 
     def _search_step(self) -> None:
@@ -171,9 +183,12 @@ class swarm:
         for p in self.__swarm:
             p.update_best()
 
+        # Global best influences all particles
+        g_best = _get_best_pos(self.__swarm)
+
         for p in self.__swarm:
             p.update_informed_best()
-            p.steer(self.__alpha, self.__beta, self.__gamma)
+            p.steer(self.__alpha, self.__beta, self.__gamma, self.__delta, g_best)
             p.move(self.__epsilon, self.__min_bounds, self.__max_bounds)
 
     def search(self, iterations) -> np.ndarray:
