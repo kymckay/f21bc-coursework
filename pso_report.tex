@@ -28,21 +28,54 @@
 
 \begin{document}
 
-\title{Particle Swarm Optimization-trained Artificial Neural Network Implementation}
+\title{Particle Swarm Optimisation-trained Artificial Neural Network Implementation}
 
 \begin{center}
-  \Large{Particle Swarm Optimization-trained Artificial Neural Network Implementation}
+  \Large{Particle Swarm Optimisation-trained Artificial Neural Network Implementation}
 \end{center}
 
 \vspace{-2em}
 \section{Introduction}
 %\vspace{-1.5em}
 
+The following specifies the implementation of a particle swarm
+optimisation (PSO) algorithm and its subsequent use in training an
+artificial neural network (ANN) to fit a binary classification dataset.
+Hyperparameter variation is explored in an effort to improve search
+space exploration and thus classification performance.
 
 \vspace{-1.5em}
 \section{Program development rationale}
 %\vspace{-1.5em}
 
+Following on from the ANN implementation, PSO was also implemented in
+Python using NumPY for efficient updates to all position and velocity
+dimensional components at once.
+
+The implementation consists of a \texttt{particle} class which houses the
+particle specific instance data (position, velocity, informants and best position found) and the
+methods used to perform position and velocity updates. The \texttt{swarm}
+class is used to instantiate a new PSO swarm with a defined set of search space
+dimensions; modify the PSO hyperparameters; and ultimately initiate a search.
+
+For quality of life, the fitness function used by the search is a parameter
+and not hard-coded into the swarm class. This means the PSO code is not coupled
+to a specific search problem and is more generally usable. By default,
+the sphere function is used for fitness since it works in \(n\) dimensions
+and is a simple test case.
+
+The swarm particles are initialised uniformly throughout the search space
+by distributing a shared uniform vector of values and their initial velocities
+are set in accordance with SPSO 2011. \cite{Clerc}
+
+During the search, the "absorbing" \cite{Chu} boundary enforcement scheme is used
+for simplicity. Other schemes were tried (random, reflecting) and found to have
+little effect.
+
+For use in investigation, a static \texttt{from\_list} method is added to
+the \texttt{network} class that converts an appropriate length \texttt{numpy.ndarray}
+into a \texttt{network} instance. In this way, a particle's current position
+represents an ANN that can be used with the dataset to produce a fitness value (loss, accuracy, etc.)
 
 \vspace{-1.5em}
 \section{Methods}
@@ -51,13 +84,13 @@
 
 Swarm size – Landscape of the problem space will influence the optimal swarm size, larger swarms are more effective at finding global minima in complex landscapes but come with additional computational complexity. Overall, the optimal swarm size is problem-dependent, heavily influenced by the dimensionality of the problem \cite{Razee}. Suggested formula for determining swarm size: S = 10 + 2sqrt(D) (for this ANN architecture and input size it implies a swarm size of 24)where D is the problem dimensions (can refer to Fig. 3.1. from the same reference)\cite{Clerc}.
 
-Neighbourhood size – e.g. the number of informants, inherent to ring topology each particle has 2 informants, justification for ring topology – simple and effective \cite{Clerc}. 
+Neighbourhood size – e.g. the number of informants, inherent to ring topology each particle has 2 informants, justification for ring topology – simple and effective \cite{Clerc}.
 
 Alpha (a, i.e. inertia weight)– proportion of the original velocity to be retained, suggested values in literature range from minimum value between 0.2 and 0.4, the maximum between 0.9 and 1.2 \cite{Razee} \cite{Gudise}.
 
 Search space - Gudise et al (2003) suggests that an overly restricted search space (e.g. in the range -1 to 1) prevents particles from finding the local minima and finds rapid improvements in the time to convergence as the search range is increased, with  optimal range (-100, 100) - infeasible for us due to the overflow issue \cite{Gudise}.
 
-Maximum velocity - something we might need to consider 
+Maximum velocity - something we might need to consider
 
 Epsilon – particles' step size, most commonly set to 1 \cite{Luke}.
 
@@ -117,14 +150,16 @@ To improve PSO's performance, alternative fitness metrics were tested. A switch 
 
 A relatively large Beta with respect to Gamma can result in excessive wandering within the problem space while the reverse  can lead to the swarm prematurely settling on a local minimum. Approximately equal values of Beta and Delta yield the most effective search of the problem space \cite{Kennedy}.
 
-Evidence of PSO being as efficient if not better at finding optimum weights than backpropagation, PSO trained ANNs generalize better to unseen data \cite{Kennedy}.
+Evidence of PSO being as efficient if not better at finding optimum weights than backpropagation, PSO trained ANNs generalise better to unseen data \cite{Kennedy}.
 
 
 \vspace{-1.5em}
 \begin{thebibliography}{10}
+
+\bibitem{Chu} W. Chu, X. Gao, S. Sorooshian, 2011, ``Handling boundary constraints for particle swarm optimization in high-dimensional search space'', doi: 10.1016/j.ins.2010.11.030
 \bibitem{Luke} Sean Luke, 2013, ``Essentials of Metaheuristics", Lulu, second edition, available at http://cs.gmu.edu/∼sean/book/metaheuristics/
 \bibitem{Kennedy} J. Kennedy, R. Eberhart, 1995, ``Particle swarm optimization," Proceedings of ICNN'95 - International Conference on Neural Networks,  pp. 1942-1948 vol.4, doi: 10.1109/ICNN.1995.488968.
-\bibitem{Razee} A. Rezaee Jordehi, J. Jasni, 2013, ``Parameter selection in particle swarm optimisation: a survey, Journal of Experimental & Theoretical Artificial Intelligence", 25:4, 527-542, DOI: 10.1080/0952813X.2013.782348
+\bibitem{Razee} A. Rezaee Jordehi, J. Jasni, 2013, ``Parameter selection in particle swarm optimisation: a survey, Journal of Experimental \& Theoretical Artificial Intelligence", 25:4, 527-542, DOI: 10.1080/0952813X.2013.782348
 \bibitem{Clerc} Maurice Clerc, 2012, ``Standard Particle Swarm Optimisation", hal-00764996
 \bibitem{Gudise}  V. G. Gudise, G. K. Venayagamoorthy, 2003, ``Comparison of particle swarm optimization and backpropagation as training algorithms for neural networks," Proceedings of the 2003 IEEE Swarm Intelligence Symposium. SIS'03 (Cat. No.03EX706), pp. 110-117, doi: 10.1109/SIS.2003.1202255.
 
