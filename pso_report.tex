@@ -43,6 +43,27 @@
 \section{Program development rationale}
 %\vspace{-1.5em}
 
+Following on from the ANN implementation, PSO was also implemented in
+Python using NumPY for efficicnet updates to all position and velocity
+dimensional components at once.
+
+The implementation consists of a \texttt{particle} class which houses the
+particle specific instance data (position, velocity, informants and best position found) and the
+methods used to perform position and velocity updates. The \texttt{swarm}
+class is used to instantiate a new PSO swarm with a defined set of search space
+dimensions; modify the PSO hyperparameters; and ultimately initiate a search.
+
+For quality of life, the fitness function used by the search is a parameter
+and not hardcoded into the swarm class. This means the PSO code is not coupled
+to a specific search problem and is more generally usable.
+
+The swarm particles are initalized uniformly throughout the search space
+by distributing a shared uniform vector of values and their initial velocities
+are set in accordance with SPSO 2011. \cite{Clerc}
+
+During the search, the "absorbing" \cite{Chu} boundary enforcement scheme is used
+for simplicity. Other schemes were tried (random, reflecting) and found to have
+little effect.
 
 \vspace{-1.5em}
 \section{Methods}
@@ -79,6 +100,8 @@ Evidence of PSO being as efficient if not better at finding optimum weights than
 
 \vspace{-1.5em}
 \begin{thebibliography}{10}
+
+\bibitem{Chu} W. Chu, X. Gao, S. Sorooshian, 2011, ``Handling boundary constraints for particle swarm optimization in high-dimensional search space'', doi: 10.1016/j.ins.2010.11.030
 \bibitem{Luke} Sean Luke, 2013, ``Essentials of Metaheuristics", Lulu, second edition, available at http://cs.gmu.edu/∼sean/book/metaheuristics/
 \bibitem{Kennedy} J. Kennedy, R. Eberhart, 1995, ``Particle swarm optimization," Proceedings of ICNN'95 - International Conference on Neural Networks,  pp. 1942-1948 vol.4, doi: 10.1109/ICNN.1995.488968.
 \bibitem{Razee} A. Rezaee Jordehi, J. Jasni, 2013, ``Parameter selection in particle swarm optimisation: a survey, Journal of Experimental \& Theoretical Artificial Intelligence", 25:4, 527-542, DOI: 10.1080/0952813X.2013.782348
