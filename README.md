@@ -16,3 +16,7 @@ The first part is an artifical neural network (ANN) written from scratch in Pyth
 The ANN is a simple feedforward multilayer architecture with configurable hyperparameters (number of layers, neurons in each layer, etc.). It learns by means of backpropagation.
 
 The dataset in question is the banknote authentication data described at: <https://archive.ics.uci.edu/ml/datasets/banknote+authentication>
+
+## Part 2: Particle Swarm Optimisation
+
+The second part is a PSO implementation used to train the ANN architecture from part 1.
