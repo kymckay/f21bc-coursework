@@ -51,13 +51,13 @@
 
 Swarm size – Landscape of the problem space will influence the optimal swarm size, larger swarms are more effective at finding global minima in complex landscapes but come with additional computational complexity. Overall, the optimal swarm size is problem-dependent, heavily influenced by the dimensionality of the problem \cite{Razee}. Suggested formula for determining swarm size: S = 10 + 2sqrt(D) where D is the problem dimensions (can refer to Fig. 3.1. from the same reference)\cite{Clerc}.
 
-Neighbourhood size – e.g. the number of informants, inherent to ring topology each particle has 2 informants, justification for ring topology – simple and effective \cite{Clerc}. 
+Neighbourhood size – e.g. the number of informants, inherent to ring topology each particle has 2 informants, justification for ring topology – simple and effective \cite{Clerc}.
 
 Alpha (a, i.e. inertia weight)– proportion of the original velocity to be retained, suggested values in literature range from minimum value between 0.2 and 0.4, the maximum between 0.9 and 1.2 \cite{Razee} \cite{Gudise}.
 
 Search space - Gudise et al (2003) suggests that an overly restricted search space (e.g. in the range -1 to 1) prevents particles from finding the local minima and finds rapid improvements in the time to convergence as the search range is increased, with  optimal range (-100, 100) - infeasible for us due to the overflow issue \cite{Gudise}.
 
-Maximum velocity - something we might need to consider 
+Maximum velocity - something we might need to consider
 
 Epsilon – particles' step size, most commonly set to 1 \cite{Luke}.
 
@@ -81,7 +81,7 @@ Evidence of PSO being as efficient if not better at finding optimum weights than
 \begin{thebibliography}{10}
 \bibitem{Luke} Sean Luke, 2013, ``Essentials of Metaheuristics", Lulu, second edition, available at http://cs.gmu.edu/∼sean/book/metaheuristics/
 \bibitem{Kennedy} J. Kennedy, R. Eberhart, 1995, ``Particle swarm optimization," Proceedings of ICNN'95 - International Conference on Neural Networks,  pp. 1942-1948 vol.4, doi: 10.1109/ICNN.1995.488968.
-\bibitem{Razee} A. Rezaee Jordehi, J. Jasni, 2013, ``Parameter selection in particle swarm optimisation: a survey, Journal of Experimental & Theoretical Artificial Intelligence", 25:4, 527-542, DOI: 10.1080/0952813X.2013.782348
+\bibitem{Razee} A. Rezaee Jordehi, J. Jasni, 2013, ``Parameter selection in particle swarm optimisation: a survey, Journal of Experimental \& Theoretical Artificial Intelligence", 25:4, 527-542, DOI: 10.1080/0952813X.2013.782348
 \bibitem{Clerc} Maurice Clerc, 2012, ``Standard Particle Swarm Optimisation", hal-00764996
 \bibitem{Gudise}  V. G. Gudise, G. K. Venayagamoorthy, 2003, ``Comparison of particle swarm optimization and backpropagation as training algorithms for neural networks," Proceedings of the 2003 IEEE Swarm Intelligence Symposium. SIS'03 (Cat. No.03EX706), pp. 110-117, doi: 10.1109/SIS.2003.1202255.
 
