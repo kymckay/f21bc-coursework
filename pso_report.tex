@@ -77,24 +77,18 @@ the \texttt{network} class that converts an appropriate length \texttt{numpy.nda
 into a \texttt{network} instance. In this way, a particle's current position
 represents an ANN that can be used with the dataset to produce a fitness value (loss, accuracy, etc.)
 
+
 \vspace{-1.5em}
 \section{Methods}
 %\vspace{-1.5em}
 
-Baseline ANN architecture - 2 layers, 4 nodes each.
+To ensure a fair comparison between back-propagation and PSO models, the same baseline architecture of 2 layers with 4 nodes each is used. To find the optimal PSO configuration the following hyper-paramters were formally investigated - swarm size, search space range, inertia weight, beta, gamma, and epsilon values. Additionally, different deltas, numbers of iterations, fitness metrics and search problems were explored in an attempt to improve PSO's performance.
 
-Swarm size – Landscape of the problem space will influence the optimal swarm size, larger swarms are more effective at finding global minima in complex landscapes but come with additional computational complexity. Overall, the optimal swarm size is problem-dependent, heavily influenced by the dimensionality of the problem \cite{Razee}. Suggested formula for determining swarm size: S = 10 + 2sqrt(D) (for this ANN architecture and input size it implies a swarm size of 24)where D is the problem dimensions (can refer to Fig. 3.1. from the same reference)\cite{Clerc}.
+Swarm sizes are tested in the range from 10 to 100 particles. The optimal swarm size is problem-dependent, heavily influenced by the dimensionality of the problem \cite{Razee}. Larger swarms are more effective at finding global minima in complex problem landscapes but come with additional computational complexity. In the older PSO implementations, \(S = 10 + 2\sqrt{D}\) is a suggested approach for determining the optimal swarm size (implies a swarm of 24 particles for the dimensionality of this problem) while newer implementations advise using 40 particles \cite{Clerc}.
 
-Neighbourhood size – e.g. the number of informants, inherent to ring topology each particle has 2 informants, justification for ring topology – simple and effective \cite{Clerc}.
+Inertia weight determines the proportion of the original velocity to be retained with suggested values ranging from minimum value between 0.2 and 0.4, the maximum between 0.9 and 1.2 \cite{Razee} \cite{Gudise}, hence the decision to test values around this range.
 
-Alpha (a, i.e. inertia weight)– proportion of the original velocity to be retained, suggested values in literature range from minimum value between 0.2 and 0.4, the maximum between 0.9 and 1.2 \cite{Razee} \cite{Gudise}.
-
-Search space - Gudise et al (2003) suggests that an overly restricted search space (e.g. in the range -1 to 1) prevents particles from finding the local minima and finds rapid improvements in the time to convergence as the search range is increased, with  optimal range (-100, 100) - infeasible for us due to the overflow issue \cite{Gudise}.
-
-Maximum velocity - something we might need to consider
-
-Epsilon – particles' step size, most commonly set to 1 \cite{Luke}.
-
+Gudise et al (2003) suggests that an overly restricted search space (e.g. in the range -1 to 1) prevents particles from finding the global minima and finds rapid improvements in the time to convergence as the search range is increased, with optimal range (-100, 100) \cite{Gudise}. From experiments with back-propagation models, it was known that most weight values are within (-1, 1) range, therefore a search space of (-100, 100) might be an overestimate for the given problem, nonetheless guided the choice for search ranges to test.
 
 \vspace{-1.5em}
 \section{Results}
@@ -125,18 +119,21 @@ Epsilon – particles' step size, most commonly set to 1 \cite{Luke}.
   \label{fig:accuracy}
 \end{figure}
 
-Expectedly, a more complex PSO implementations increases ANN training time (Figure \ref{fig:ttime}). 
+Expectedly, a more complex PSO implementations increases ANN's training time (Figure \ref{fig:ttime}). 
 
-PSO-trained ANNs are evidently underperforming compared to back-propagation models, with top accuracy of $\sim$51\% (Figure \ref{fig:accuracy}). Similarly low accuracies, regardless of PSO hyper-parameter combination used, suggest that PSO particles get stuck in a local optima. 
+PSO-trained ANNs are evidently underperforming compared to back-propagation models, with top accuracy of $\sim$51\% (Figure \ref{fig:accuracy}). Similarly low accuracies, regardless of PSO hyper-parameter combination used, suggest that PSO particles easily get stuck in a local optima.
 
-To improve PSO's performance, alternative fitness metrics were tested. A switch from classification accuracy to using cross-entropy loss value was made to capture a more detailed change in ANN's performance as the particles move through search space.  An observation that all input instances are classified as the dominant class (i.e., the class with more instances) motivated the switch to a fitness metric insensitive to class size  imbalances, i.e. Matthew's Correlation Coefficient (MCC). Using MCC prevents classifying all inputs as a single class, however the overall accuracy decreased. 
-
-PSO's seeming lack of responsiveness to any hyper-parameter changes, prevents from making any meaningful conclusions about the importance of different hyper-paramters in the algorithm's performance - any effects are cancelled out by the swarm getting bound to a local optima. 
+To improve PSO's performance, alternative fitness metrics were tested. A switch from classification accuracy to cross-entropy loss value was made to capture a more detailed change in ANN's performance as the particles move through search space.  An observation that all input instances are classified as the dominant class (i.e., the class with more instances) motivated the switch to a fitness metric insensitive to class size  imbalances, i.e. Matthew's Correlation Coefficient (MCC). Using MCC prevents classifying all inputs as a single class, however the overall accuracy decreased. 
+ 
 
 A relatively large Beta with respect to Gamma can result in excessive wandering within the problem space while the reverse  can lead to the swarm prematurely settling on a local minimum. Approximately equal values of Beta and Delta yield the most effective search of the problem space \cite{Kennedy}.
 
-Evidence of PSO being as efficient if not better at finding optimum weights than backpropagation, PSO trained ANNs generalise better to unseen data \cite{Kennedy}.
+Particles' step size is most commonly set to 1 \cite{Luke}. 
 
+
+PSO's seeming lack of responsiveness to any hyper-parameter changes, prevents from making any meaningful conclusions about the importance of optimal hyper-paramter combinations in the algorithm's performance - any effects are cancelled out by the swarm getting bound to a local optima. Despite research evidence of PSOs being as efficient if not better at finding optimum weights than backpropagation and PSO trained ANNs generalising better to unseen data \cite{Kennedy}, our results do not support the same conclusion. Based on the classification accuracy and the increased training time, back-propagation is by far a better approach for ANN training for the given classification problem.
+
+In retrospect, enforcing boundaries for velocity values ..
 
 \vspace{-1.5em}
 \begin{thebibliography}{10}
