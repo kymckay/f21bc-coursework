@@ -121,9 +121,16 @@ Gudise et al (2003) suggests that an overly restricted search space (e.g. in the
   \label{fig:accuracy}
 \end{figure}
 
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=1\textwidth]{figs/sphere_pso.png}
+  \caption{Positions (in the first dimension) of 10 particles in a PSO swarm applied to the 70 dimensional Sphere function}
+  \label{fig:sphere}
+\end{figure}
+
 Expectedly, a more complex PSO implementations increases ANN's training time (Figure \ref{fig:ttime}).
 
-PSO-trained ANNs are evidently underperforming compared to back-propagation models, with top accuracy of $\sim$51\% (Figure \ref{fig:accuracy}). Similarly low accuracies, regardless of PSO hyper-parameter combination used, suggest that PSO particles easily get stuck in a local optima.
+PSO-trained ANNs are evidently underperforming compared to back-propagation models, with top accuracy of $\sim$51\% (Figure \ref{fig:accuracy}). Similarly low accuracies, regardless of PSO hyper-parameter combination used, suggest that PSO particles easily get stuck in a local optima. It is observed, as shown in Figure \ref{fig:sphere}, that PSO is able to find the global minima at the origin point of the simpler Sphere function test case.
 
 To improve PSO's performance, alternative fitness metrics were tested. A switch from classification accuracy to cross-entropy loss value was made to capture a more detailed change in ANN's performance as the particles move through search space.  An observation that all input instances are classified as the dominant class (i.e., the class with more instances) motivated the switch to a fitness metric insensitive to class size  imbalances, i.e. Matthew's Correlation Coefficient (MCC). Using MCC prevents classifying all inputs as a single class, however the overall accuracy decreased.
 
