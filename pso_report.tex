@@ -36,7 +36,7 @@
 
 \vspace{-2em}
 \section{Introduction}
-%\vspace{-1.5em}
+\vspace{-1.5em}
 
 The following specifies the implementation of a particle swarm
 optimisation (PSO) algorithm and its subsequent use in training an
@@ -46,7 +46,7 @@ space exploration and thus classification performance. Finally, PSO is compared 
 
 \vspace{-1.5em}
 \section{Program development rationale}
-%\vspace{-1.5em}
+\vspace{-1.5em}
 
 Following on from the ANN implementation, PSO was also implemented in
 Python using NumPY for efficient updates to all position and velocity
@@ -82,7 +82,7 @@ represents an ANN that can be used with the dataset to produce a fitness value (
 
 \vspace{-1.5em}
 \section{Methods}
-%\vspace{-1.5em}
+\vspace{-1.5em}
 
 To ensure a fair comparison between back-propagation and PSO models, the same baseline architecture of 2 layers with 4 nodes each is used. To find the optimal PSO configuration the following hyper-paramters were formally investigated - swarm size, search space range, inertia weight, beta, gamma, and epsilon values. Additionally, different deltas, numbers of iterations, fitness metrics, ANN architectures and search problems were explored in an attempt to improve PSO's performance.
 
@@ -94,7 +94,7 @@ Gudise et al (2003) suggests that an overly restricted search space (e.g. in the
 
 \vspace{-1.5em}
 \section{Results}
-%\vspace{-1.5em}
+\vspace{-1.5em}
 
 
 \begin{figure}[H]
@@ -131,7 +131,7 @@ Gudise et al (2003) suggests that an overly restricted search space (e.g. in the
 
 \vspace{-1.5em}
 \section{Discussion}
-%\vspace{-1.5em}
+\vspace{-1.5em}
 
 Expectedly, a more complex PSO implementations increases ANN's training time (Figure \ref{fig:ttime}).
 
@@ -139,16 +139,17 @@ PSO-trained ANNs are evidently underperforming compared to back-propagation mode
 
 To improve PSO's performance, alternative fitness metrics were tested. A switch from classification accuracy to cross-entropy loss value was made to capture a more detailed change in ANN's performance as the particles move through search space.  An observation that all input instances are classified as the dominant class (i.e., the class with more instances) motivated the switch to a fitness metric insensitive to class size  imbalances, i.e. Matthew's Correlation Coefficient (MCC). Using MCC prevents classifying all inputs as a single class, however the overall accuracy decreased.
 
+PSO-trained ANNs are evidently underperforming compared to back-propagation models, with top accuracy of $\sim$51\% (Figure \ref{fig:accuracy}). Similarly low accuracies, regardless of PSO hyper-parameter combination used, suggest that PSO particles easily get stuck in a local optima.
+
 To improve PSO's performance, alternative fitness metrics were tested. A switch from classification accuracy to cross-entropy loss value was made to capture a more detailed change in ANN's performance as the particles move through search space.  An observation that all input instances are classified as the dominant class (i.e., the class with more instances) motivated the switch to a fitness metric insensitive to class size  imbalances, i.e. Matthew's Correlation Coefficient (MCC). Using MCC prevents classifying all inputs as a single class, however the overall accuracy was not improved. 
 
-
-A relatively large Beta with respect to Gamma can result in excessive wandering within the problem space while the reverse  can lead to the swarm prematurely settling on a local minimum. Approximately equal values of Beta and Delta yield the most effective search of the problem space \cite{Kennedy}.
+Similar default values for the cognitive and social  A relatively large beta with respect to gamma can result in excessive wandering within the problem space while the reverse  can lead to the swarm prematurely settling on a local minimum. Approximately equal values of beta and gamma yield the most effective search of the problem space \cite{Kennedy}.
 
 Particles' step size is most commonly set to 1 \cite{Luke}, however based on the swarm's behaviour, a possible explanation for seeming affinity to local optimums
 
 \vspace{-1.5em}
 \section{Conclusions}
-%\vspace{-1.5em}
+\vspace{-1.5em}
 
 PSO's seeming lack of responsiveness to any hyper-parameter changes, prevents from making any meaningful conclusions about the importance of optimal hyper-paramter combinations in the algorithm's performance - any effects are cancelled out by the swarm getting bound to a local optima. Despite research evidence of PSOs being as efficient if not better at finding optimum weights than backpropagation and PSO trained ANNs generalising better to unseen data \cite{Kennedy}, our results do not support the same conclusion. Based on the classification accuracy and the increased training time, back-propagation is by far a better approach for ANN training for the given classification problem.
 
