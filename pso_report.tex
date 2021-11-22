@@ -52,7 +52,6 @@ and solving the given classification problem.
 
 Following on from the ANN implementation, PSO was also implemented in
 Python using NumPy for efficient updates to particle positions and velocities.
-
 The implementation consists of a \texttt{particle} class which contains
 the logic to update positions and velocities at each search iteration.
 A PSO swarm can be instantiated as the \texttt{swarm} class, which provides
@@ -71,13 +70,13 @@ immediately leaving the search space. A ring topology \cite{Clerc} is used to
 ensure there is an adequate linkage for information to propagate through
 the swarm.
 
-During search, the "absorbing" \cite{Chu} boundary enforcement scheme is used
+During search, the ``absorbing'' \cite{Chu} boundary enforcement scheme is used
 for simplicity. Other schemes were tried (e.g. random, reflecting) and
 found to have little effect.
 
 A static \texttt{from\_list} method is added to the \texttt{network}
 class that converts an appropriate length \texttt{numpy.ndarray}
-into a \texttt{network} instance. In this way, a particle's current position
+into a set of weights and activation functions for a \texttt{network} instance. In this way, a particle's current position
 can represent an ANN that can be used with the dataset to produce a
 fitness value (loss, accuracy, etc.).
 
@@ -104,6 +103,7 @@ Gudise et al (2003) suggest that an overly restricted search space (e.g. in the 
 \begin{figure}[H]
   \centering
   \includegraphics[width=1\textwidth]{figs/combo_ttime.png}
+  \vspace{-1.5em}
   \caption{
     Average training time of each model across 10 iterations.
     Modified hyper-parameter abbreviation identifies each model:
@@ -116,6 +116,7 @@ Gudise et al (2003) suggest that an overly restricted search space (e.g. in the 
 \begin{figure}[H]
   \centering
   \includegraphics[width=1\textwidth]{figs/combo_acc.png}
+  \vspace{-1.5em}
   \caption{
     Average accuracy of each model across 10 iterations.
     Modified hyper-parameter abbreviation identifies each model:
@@ -128,7 +129,8 @@ Gudise et al (2003) suggest that an overly restricted search space (e.g. in the 
 
 \begin{figure}[H]
   \centering
-  \includegraphics[width=1\textwidth]{figs/sphere_pso.png}
+  \includegraphics[width=0.9\textwidth]{figs/sphere_pso.png}
+  \vspace{-1em}
   \caption{Positions (in the first dimension) of 10 particles in a PSO swarm applied to the 70 dimensional Sphere function.}
   \label{fig:sphere}
 \end{figure}
@@ -143,7 +145,7 @@ PSO-trained ANNs are evidently under-performing also in terms of classification 
 
 To improve PSO's performance, alternative fitness metrics were tested. A switch from classification accuracy to cross-entropy loss value was made to capture a more detailed change in ANN's performance as the particles move through search space.  An observation that all input instances are classified as the dominant class (i.e. the class with more instances) motivated the switch to a fitness metric insensitive to class size  imbalances -- i.e. Matthew's Correlation Coefficient (MCC). Using MCC prevents classifying all inputs as a single class, however the overall accuracy was not improved.
 
-Luke suggests particle step size is most commonly set to 1 \cite{Luke}. However, a range of epsilon values from 0.001 to 1.5 is tested because of the observed swarm behaviour and seeming affinity to local optimums. It is theorised that this could be explained by the particles overshooting the global optima in a complex search landscape. Unfortunately, the different step sizes had no success in terms of improving classification accuracy.
+Luke (2013) suggests particle step size is most commonly set to 1 \cite{Luke}. However, a range of epsilon values from 0.001 to 1.5 is tested because of the observed swarm behaviour and seeming affinity to local optimums. It is theorised that this could be explained by the particles overshooting the global optima in a complex search landscape. Unfortunately, the different step sizes had no success in terms of improving classification accuracy.
 
 \vspace{-1.5em}
 \section{Conclusions}
